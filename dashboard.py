@@ -1,49 +1,54 @@
-import tkinter as tk
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output, State
 from openai import OpenAI
+import pandas as pd
+import plotly.express as px
 
-class QuerriUI:
-    def __init__(self, master):
-        self.master = master
-        self.master.title("Querri Chatbot")
-        
-        # Create OpenAI instance
-        self.openai_client = OpenAI(api_key='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')
+# Reading in our csv
+school = pd.read_csv('data\student_math_clean.csv')
 
-        # Create UI components
-        self.label = tk.Label(master, text="How can Querri help you today?")
-        self.label.pack()
+# Creating the Dash application
+app = dash.Dash(__name__)
 
-        self.user_input = tk.Entry(master, width=50)
-        self.user_input.pack()
+# API Key
+openai_client = OpenAI(api_key='API_KEY_HERE')
 
-        self.response_label = tk.Label(master, text="")
-        self.response_label.pack()
+# Layout
+app.layout = html.Div([
+    html.H1("Querri - The OpenAI Chatbot"),
+    
+    # Input for user
+    dcc.Input(id='user-input', type='text', placeholder='What would you like Querri to do? '),
+    
+    # Button to submit
+    html.Button('Submit', id='submit-button', n_clicks=0),
+    
+    # Output to display model response
+    html.Div(id='output-message'),
+])
 
-        self.submit_button = tk.Button(master, text="Submit", command=self.get_user_response)
-        self.submit_button.pack()
+# Define callback to handle button click
+@app.callback(
+    Output('output-message', 'children'),
+    Input('submit-button', 'n_clicks'),
+    State('user-input', 'value')
+)
+def generate_response(n_clicks, user_input):
+    if n_clicks > 0:
+        user_message = {"role": "user", "content": user_input}
 
-        self.terminate_button = tk.Button(master, text="Exit", command=self.terminate_chat)
-        self.terminate_button.pack()
-
-    def get_user_response(self):
-        user_response = self.user_input.get()
-        user_message = {"role": "user", "content": user_response}
-
-        completion_response = self.openai_client.chat.completions.create(
+        completion_response = openai_client.chat.completions.create(
             model="gpt-4",
             messages=[user_message],
         )
 
-        bot_response = completion_response.choices[0].message.content
-        self.response_label.config(text=bot_response)
+        model_response = completion_response.choices[0].message.content
 
-    def terminate_chat(self):
-        self.master.destroy()
+        return html.Div([
+            html.H4("Model Response:"),
+            html.P(model_response)
+        ])
 
-def main():
-    root = tk.Tk()
-    querri_ui = QuerriUI(root)
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run_server(debug=True)
