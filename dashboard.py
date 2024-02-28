@@ -2,6 +2,9 @@ import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
 from openai import OpenAI
+import os
+
+
 
 # Creating the Dash application
 app = dash.Dash(__name__)
@@ -10,9 +13,8 @@ app = dash.Dash(__name__)
 initial_projects = ['Project A']
 
 # Placeholder for your OpenAI API key
-openai_api_key = 'our_api_key'
-openai_client = OpenAI(api_key=openai_api_key)
-
+api_key = os.getenv('API_KEY')
+openai_client = OpenAI(api_key=api_key)
 # Layout
 app.layout = html.Div([
     # Top section for projects
