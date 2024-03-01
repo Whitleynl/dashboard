@@ -3,8 +3,11 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State
 from openai import OpenAI
 import os
+import pandas as pd
+import matplotlib.pyplot as plt
 
-
+# Reading in the csv
+studentCsv = 'data\student_math_clean.csv'
 
 # Creating the Dash application
 app = dash.Dash(__name__)
@@ -85,6 +88,110 @@ def generate_response(n_clicks, user_input, selected_project):
             html.H4(f"Model Response for {selected_project}:"),
             html.P(model_response)
         ])
+    
+def genderVsFinal(studentCsv):
+    # Bar Chart
+    df = pd.read_csv(studentCsv)
+
+    genderAvgFinalGrade = df.groupby('sex')['final_grade'].mean().reset_index()
+
+    plt.figure(figsize=(8,6))
+    plt.bar(genderAvgFinalGrade['sex'], genderAvgFinalGrade['final_grade'], color=['pink', 'blue'])
+    plt.title('Gender vs. Average Final Grade')
+    plt.xlabel('Gender')
+    plt.ylabel('Average Final Grade')
+    plt.show()
+
+def schoolSupportvsFamilySupport(studentCsv):
+    # Stacked Bar Chart
+    df = pd.read_csv(studentCsv)
+
+    supportAvg = df.groupby('school_support')['final_grade'].mean().reset_index()
+
+    supportAvg.plot(x='school_support', kind='bar', stacked=True, figsize=(10, 6), color=['green', 'orange'])
+    plt.title('School Support vs. Family Support')
+    plt.xlabel('Support Type')
+    plt.ylabel('Average Final Grade')
+    plt.show()
+    
+
+def weekdayAlcoholVsWeekendAlcohol(studentCsv):
+    # Boxplot
+    df = pd.read_csv(studentCsv)
+
+    alcohol_avg = df.groupby('weekday_alcohol')['final_grade'].mean().reset_index()
+
+    alcohol_avg.plot(x='weekday_alcohol', kind='bar', figsize=(10, 6), color=['purple', 'yellow'])
+    plt.title('Weekday Alcohol vs. Weekend Alcohol')
+    plt.xlabel('Alcohol Consumption')
+    plt.ylabel('Average Final Grade')
+    plt.show()
+
+def freetimeVsSocial(studentCsv):
+    # Scatter Plot
+    df = pd.read_csv(studentCsv)
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(df['free_time'], df['social'])
+    plt.title('Free_time vs. Social Activity')
+    plt.xlabel('Freetime')
+    plt.ylabel('Social Activity')
+    plt.show() 
+
+def firstGradeVsFinal(studentCsv):
+    # Scatter Plot
+    df = pd.read_csv(studentCsv)
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(df['grade_1'], df['final_grade'])
+    plt.title('First Grade vs. Final Grade')
+    plt.xlabel('First Grade')
+    plt.ylabel('Final Grade')
+    plt.show() 
+
+# Additional Functions
+def schoolDistribution(studentCsv):
+    # School Distribution
+    df = pd.read_csv(studentCsv)
+    school_counts = df['school'].value_counts()
+    plt.figure(figsize=(8, 6))
+    school_counts.plot(kind='bar', color=['skyblue', 'lightcoral'])
+    plt.title('Distribution of Students by School')
+    plt.xlabel('School')
+    plt.ylabel('Number of Students')
+    plt.show()
+
+def ageDistribution(studentCsv):
+    # Age Distribution
+    df = pd.read_csv(studentCsv)
+    plt.figure(figsize=(8, 6))
+    plt.hist(df['age'], bins=15, color='lightgreen', edgecolor='black')
+    plt.title('Age Distribution of Students')
+    plt.xlabel('Age')
+    plt.ylabel('Number of Students')
+    plt.show()
+
+def internetAccessDistribution(studentCsv):
+    # Internet Access
+    df = pd.read_csv(studentCsv)
+    internet_counts = df['internet_access'].value_counts()
+    plt.figure(figsize=(8, 6))
+    internet_counts.plot(kind='pie', autopct='%1.1f%%', colors=['lightblue', 'lightcoral'])
+    plt.title('Internet Access of Students')
+    plt.ylabel('')
+    plt.show()
+
+def familyRomanticRelationship(studentCsv):
+    # Family Relationship vs. Romantic Relationship
+    df = pd.read_csv(studentCsv)
+    relationship_counts = df.groupby(['family_relationship', 'romantic_relationship']).size().unstack()
+    plt.figure(figsize=(10, 6))
+    relationship_counts.plot(kind='bar', stacked=True, color=['lightgreen', 'lightcoral'])
+    plt.title('Family Relationship vs. Romantic Relationship')
+    plt.xlabel('Family Relationship')
+    plt.ylabel('Number of Students')
+    plt.show()
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
