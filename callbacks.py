@@ -1,6 +1,7 @@
-# Assuming the 'app' instance is imported from app.py
 from dash.dependencies import Input, Output, State
 from dash import html
+from data_processing import genderVsFinal
+
 
 def register_callbacks(app, openai_client):
     @app.callback(
@@ -8,6 +9,7 @@ def register_callbacks(app, openai_client):
         [Input('submit-button', 'n_clicks')],
         [State('user-input', 'value'), State('project-dropdown', 'value')]
     )
+
     def generate_response(n_clicks, user_input, selected_project):
         if n_clicks > 0:
             user_message = {"role": "user", "content": user_input}

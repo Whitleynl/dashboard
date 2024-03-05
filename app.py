@@ -3,6 +3,7 @@ from layout import app_layout
 from openai import OpenAI
 import os
 from callbacks import register_callbacks
+from plotly_to_html import render_genderVsFinal, render_schoolDistribution, render_schoolSupportVsFamilySupport, render_weekdayAlcoholVsWeekendAlcohol
 
 
 # Initialize Dash app
