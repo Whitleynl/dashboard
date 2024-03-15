@@ -18,8 +18,10 @@ def register_callbacks(app, openai_client):
                 model="gpt-4",
                 messages=[user_message],
             )
-
             model_response = completion_response.choices[0].message.content
+            # extract the code to run from this response
+            # run the cleaned code using the exec function
+            # use the outputs of the executed code to update the app
 
             return html.Div([
                 html.H4(f"Model Response for {selected_project}:"),
