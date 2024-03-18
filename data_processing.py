@@ -3,6 +3,7 @@ import plotly.express as px
 
 studentCsv = 'data/student_math_clean.csv'
 
+'''
 def genderVsFinal():
     df = pd.read_csv(studentCsv)
     # Convert Matplotlib plotting to Plotly here
@@ -21,8 +22,20 @@ def add_new_project(n_clicks, new_project_name, current_options):
     return current_options
 
 
-def schoolSupportVsFamilySupport(studentCsv):
-    df = pd.read_csv(studentCsv)
+
+
+
+Please generate me a graph using data from the csv file stored in the variable file_path = os.path.join(os.getcwd(), 'data', 'student_math_clean.csv'). 
+The file contains the following columns: 
+student_id,school,sex,age,address_type,family_size,parent_status,mother_education,father_education,mother_job,father_job,school_choice_reason,
+guardian,travel_time,studytime,class_failures,school_support,family_support,extra_paid_classes,activities,nursery_school,higher_ed,
+internet_access,romantic_relationship,family_relationship,free_time,social,weekday_alcohol,weekend_alcohol,health,absences,grade_1,
+grade_2,final_grade
+
+Here is some example code of a graph that I designed: 
+
+def schoolSupportVsFamilySupport(file_path):
+    df = pd.read_csv(file_path)
     
     # Assuming 'school_support' is a column indicating whether students received school support.
     # If you also have a 'family_support' column and want to compare, you'd need to adjust the DataFrame grouping/aggregation accordingly.
@@ -38,6 +51,20 @@ def schoolSupportVsFamilySupport(studentCsv):
     # Optionally, customize the layout further
     fig.update_layout(xaxis_title='School Support', yaxis_title='Average Final Grade')
     return fig
+
+Please ensure that the graph effectively represents something of meaning revolving around the csv file and the relationship 
+the students have based on their school and life. Explicitly ensure that you functions have 'file_path' as a parameter in order
+to avoid errors like this TypeError: motherEdVsFatherEd() missing 1 required positional argument: 'file_path'.
+
+
+
+Using this code as an example: import os import pandas as pd import matplotlib.pyplot as plt import seaborn as sns  
+# File path file_path = os.path.join(os.getcwd(), 'data', 'student_math_clean.csv')  # Read the csv file 
+student_data = pd.read_csv(file_path)  # Plot plt.figure(figsize=(10, 6))  # Joint plot with marginal histograms:
+Travel Time vs Study Time sns.jointplot(data=student_data, x='travel_time', y='studytime', kind='hex', height=8,
+marginal_ticks=True)  # Title plt.subplots_adjust(top=0.95) plt.suptitle("Relationship between Travel Time and
+Study Time", fontsize=16)  plt.show(), generate a graph that effectively displays data in a intuitive way using
+grade_1 and final_grade as your columns. 
     
 
 def weekdayAlcoholVsWeekendAlcohol(studentCsv):
@@ -144,4 +171,4 @@ def familyRomanticRelationship(studentCsv):
     # Optionally, customize the layout further
     fig.update_layout(xaxis_title='Family Relationship', yaxis_title='Number of Students', barmode='stack')
     return fig
-
+'''

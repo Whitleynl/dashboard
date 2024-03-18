@@ -9,11 +9,15 @@ from callbacks import register_callbacks
 app = dash.Dash(__name__) 
 app.layout = app_layout()
 
+# Retrieve API key from environment variable
 OPENAI_API_KEY = os.getenv('API_KEY')
 
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+# Check if API key is set
+if OPENAI_API_KEY is None:
+    raise ValueError("OpenAI API key not found. Please set the 'OPENAI_API_KEY' environment variable.")
 
-student_csv_path = 'data/student_math_clean.csv'
+# Initialize OpenAI client
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Register callbacks
 register_callbacks(app, openai_client) 
