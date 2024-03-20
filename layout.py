@@ -59,17 +59,14 @@ def app_layout():
             ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}),
 
             # Submit Button
-            html.Button(
-                'Submit',
+            html.Img(
+                src='https://cdn-icons-png.flaticon.com/128/10610/10610564.png',
                 id='submit-button',
                 n_clicks=0,
-                style={
+                 style={
                     'height': '60px', 
-                    'width': '120px', 
+                    'width': '60px', 
                     'borderRadius': '25px', 
-                    'backgroundColor': '#2D3339', 
-                    'color': 'white', 
-                    'border': 'none', 
                     'cursor': 'pointer', 
                     'position': 'absolute', 
                     'right': '144px', 
