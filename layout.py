@@ -20,15 +20,6 @@ def app_layout():
                 searchable=False,
                 clearable=False
             ),
-
-            #Add Project Button
-            #html.Button('Add Project', id='add-project-button', n_clicks=0),
-
-            #New project input
-            #dcc.Input(id='new-project-input', type='text', placeholder='Enter new project name'),
-
-            #Submit Project Button
-            #html.Button('Submit New Project', id='submit-new-project-button', n_clicks=0),
             
         ], style={
             'width': '15%', 
@@ -39,16 +30,18 @@ def app_layout():
             'overflowY': 'auto', 
             'backgroundColor': '#2D3339', 
             'color': 'white', 
-            'padding': '20px'
+            'padding': '20px',
+            'textAlign': 'center'
             }),
 
         # Bottom section for chat box
         html.Div([
-            dcc.Input(
-                id='user-input',
-                type='text',
-                placeholder='How can Querri help you today?',
-                style={
+            html.Div([
+                dcc.Input(
+                    id='user-input',
+                    type='text',
+                    placeholder='How can Querri help you today?',
+                    style={
                     'width': 'calc(120% - 40px)', 
                     'height': '60px', 
                     'borderRadius': '25px', 
@@ -63,15 +56,37 @@ def app_layout():
                     'left': '50%', 
                     'transform': 'translateX(-50%)'
                     }
-            ),
+                ),
 
+                # Submit Button
+                html.Button(
+                    'Submit',
+                    id='submit-button',
+                    n_clicks=0,
+                    style={
+                        'height': '60px', 
+                        'width': '120px', 
+                        'borderRadius': '25px', 
+                        'backgroundColor': '#2D3339', 
+                        'color': 'white', 
+                        'border': 'none', 
+                        'cursor': 'pointer', 
+                        'position': 'absolute', 
+                        'right': '-8%', 
+                        'top': '50%', 
+                        'transform': 'translateY(-100%)'
+                        }
+                ),
+            ], style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center', 'position': 'relative', 'width': '100%'}),
+            
             # Output to display model response
             html.Div(id='output-plots', style={'marginTop': '20px'})  # Chat response
         ], style={
             'display': 'flex', 
+            'flexDirection': 'column',
             'alignItems': 'center', 
             'position': 'fixed', 
-            'bottom': '0', 
+            'bottom': '20px', 
             'left': '50%', 
             'transform': 'translateX(-50%)', 
             'width': '70%', 
