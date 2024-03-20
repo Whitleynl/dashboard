@@ -2,7 +2,7 @@ import os
 import re
 import ast
 import matplotlib
-matplotlib.use('TkAgg') # interactive display
+matplotlib.use('Agg') # interactive display
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
@@ -61,6 +61,10 @@ def clean_code_string(code_string):
     # Syntax validation (optional but recommended)
     try:
         ast.parse(cleaned_code)
+
+        # Printing the parsed code in order to see what we are getting from the AI
+        print(cleaned_code)
+
     except SyntaxError as e:
         print(f"Code cleanup failed. Extracted code block is not valid Python syntax. Error: {e}")
         return None  # or handle as appropriate for your application

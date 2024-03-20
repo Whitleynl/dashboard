@@ -171,4 +171,43 @@ def familyRomanticRelationship(studentCsv):
     # Optionally, customize the layout further
     fig.update_layout(xaxis_title='Family Relationship', yaxis_title='Number of Students', barmode='stack')
     return fig
+
+
+
+
+
+
+
+
+Using T-sne, create a graph using the csv file stored in file_path = os.path.join(os.getcwd(), 'data', 'student_math_clean.csv'). Use columns
+ from this student_id,school,sex,age,address_type,family_size,parent_status,mother_education,father_education,mother_job,father_job,school_choice_reason,
+ guardian,travel_time,studytime,class_failures,school_support,family_support,extra_paid_classes,activities,nursery_school,higher_ed,internet_access
+ ,romantic_relationship,family_relationship,free_time,social,weekday_alcohol,weekend_alcohol,health,absences,grade_1,grade_2,final_grade
+ to do so. Make sure to check if the columns are numeric or not before you try and work with them. Here is some python code to help you decide on
+ how to format your responce: 
+
+def schoolSupportVsFamilySupport(file_path):
+    df = pd.read_csv(file_path)
+    
+    # Assuming 'school_support' is a column indicating whether students received school support.
+    # If you also have a 'family_support' column and want to compare, you'd need to adjust the DataFrame grouping/aggregation accordingly.
+    supportAvg = df.groupby('school_support')['final_grade'].mean().reset_index()
+
+    # Create a bar chart using Plotly Express
+    fig = px.bar(supportAvg, x='school_support', y='final_grade',
+                 title='School Support vs. Average Final Grade',
+                 labels={'school_support': 'School Support', 'final_grade': 'Average Final Grade'},
+                 color='school_support',  # This will color bars differently based on 'school_support' value
+                 barmode='group')  # Use 'group' for grouped bar chart, remove or set to 'stack' for stacked
+
+    # Optionally, customize the layout further
+    fig.update_layout(xaxis_title='School Support', yaxis_title='Average Final Grade')
+    return fig
+
+Please ensure that the graph effectively represents something of meaning revolving around the csv file and the relationship 
+the students have based on their school and life. Make sure to import os in order to access the file. Along with this make sure
+that you are importing all of the neccessary packages as the code provided is just an example. 
+
+
+
 '''
