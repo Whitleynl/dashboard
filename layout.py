@@ -53,7 +53,8 @@ def app_layout():
                         'position': 'absolute', 
                         'bottom': '20px', 
                         'left': '50%', 
-                        'transform': 'translateX(-50%)'
+                        'transform': 'translateX(-50%)',
+                        'zIndex': 1
                     }
                 ),
             ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}),
@@ -71,11 +72,12 @@ def app_layout():
                     'position': 'absolute', 
                     'right': '144px', 
                     'bottom': '20px',
+                    'zIndex': 1
                 }
             ),
             
             # Output to display model response
-            html.Div(id='output-plots', style={'marginTop': '100px'})  # Chat response
+            html.Div(id='output-plots', style={'marginTop': '100px', 'zIndex': 0})  # Chat response
         ], style={
             'display': 'flex', 
             'flexDirection': 'column',
@@ -85,7 +87,7 @@ def app_layout():
             'left': '292px', #Adjust if you do not like the white gap on the left 
             'right': '0', 
             'backgroundColor': '#394349',
-            'height': '1500px'
+            'height': '1080px'
         }),
 
     ])
