@@ -39,8 +39,10 @@ def app_layout():
                 dcc.Input(
                     id='user-input',
                     type='text',
-                    placeholder='How can Querri help you today?',
+                    placeholder='How can Querri help you today?',                    
                     style={
+                        #increase font size:
+                        'fontSize': '18px',
                         'width': 'calc(100% - 290px)',  # Adjust width to span from left edge to right edge
                         'height': '60px',
                         'borderRadius': '25px', 
