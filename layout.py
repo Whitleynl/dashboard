@@ -56,34 +56,32 @@ def app_layout():
                 #allow multiple files to be uploaded
                 multiple=True
             ),
-            
-            html.Div([
-                dcc.Input(
-                    id='user-input',
-                    type='text',
-                    placeholder='How can Querri help you today?',                    
-                    style={
-                        #increase font size:
-                        'fontSize': '18px',
-                        'width': 'calc(100% - 290px)',  # Adjust width to span from left edge to right edge
-                        'height': '60px',
-                        'borderRadius': '25px', 
-                        'paddingLeft': '20px', 
-                        'border': '1px solid #ccc', 
-                        'outline': 'none', 
-                        'margin': '20px auto 0 auto', 
-                        'display': 'block', 
-                        'boxSizing': 'border-box', 
-                        'position': 'absolute', 
-                        'bottom': '20px', 
-                        'left': '50%', 
-                        'transform': 'translateX(-50%)',
-                        'zIndex': 1
-                    }
-                ),
-            ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}),
-
-            # Submit Button
+            html.Div(id='output-data-upload')
+        ]),
+        html.Div([
+            dcc.Input(
+                id='user-input',
+                type='text',
+                placeholder='How can Querri help you today?',                    
+                style={
+                    #increase font size:
+                    'fontSize': '18px',
+                    'width': 'calc(100% - 290px)',  # Adjust width to span from left edge to right edge
+                    'height': '60px',
+                    'borderRadius': '25px', 
+                    'paddingLeft': '20px', 
+                    'border': '1px solid #ccc', 
+                    'outline': 'none', 
+                    'margin': '20px auto 0 auto', 
+                    'display': 'block', 
+                    'boxSizing': 'border-box', 
+                    'position': 'absolute', 
+                    'bottom': '20px', 
+                    'left': '50%', 
+                    'transform': 'translateX(-50%)',
+                    'zIndex': 1
+                }
+            ),
             html.Img(
                 src='https://cdn-icons-png.flaticon.com/128/10610/10610564.png',
                 id='submit-button',
@@ -98,22 +96,21 @@ def app_layout():
                     'bottom': '20px',
                     'zIndex': 1
                 }
-            ),
-            
-            # Output to display model response
-            html.Div(id='output-plots', style={'marginTop': '100px', 'zIndex': 0})  # Chat response
-        ], style={
-            'display': 'flex', 
-            'flexDirection': 'column',
-            'alignItems': 'center', 
-            'position': 'fixed', 
-            'bottom': '0', 
-            'left': '292px', #Adjust if you do not like the white gap on the left 
-            'right': '0', 
-            'backgroundColor': '#394349',
-            'height': '1080px'
-        }),
+            )
+        ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}),
 
-    ])
+        # Output to display model response
+        html.Div(id='output-plots', style={'marginTop': '100px', 'zIndex': 0})  # Chat response
+    ], style={
+        'display': 'flex', 
+        'flexDirection': 'column',
+        'alignItems': 'center', 
+        'position': 'fixed', 
+        'bottom': '0', 
+        'left': '292px', #Adjust if you do not like the white gap on the left 
+        'right': '0', 
+        'backgroundColor': '#394349',
+        'height': '1080px'
+    })
 
     return layout

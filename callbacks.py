@@ -130,27 +130,27 @@ def register_callbacks(app, openai_client):
     )
 
     def generate_response(n_clicks, user_input, selected_project):
-        if n_clicks > 0:
+        if n_clicks > 0: 
             user_message = {"role": "user", "content": user_input}
 
             completion_response = openai_client.chat.completions.create(
                 model="gpt-4",
                 messages=[user_message],
             )
-            model_response = completion_response.choices[0].message.content
+            model_response = completion_response.choices[0].message.content 
             # extract the code to run from this response
-            extracted_code = model_response
+            extracted_code = model_response 
 
             # clean the code 
-            cleaned_code = clean_code_string(extracted_code)
+            cleaned_code = clean_code_string(extracted_code) 
 
-            if cleaned_code is None:
+            if cleaned_code is None: 
                 raise PreventUpdate # Don't update the app if the code cleanup fails  
 
             # run the cleaned code using the exec function
-            exec_global = {}
+            exec_global = {} 
             try: 
-                exec(cleaned_code, exec_global)
+                exec(cleaned_code, exec_global) 
             except Exception as e:
                 print(f"Error in execution: {e}")
                 raise PreventUpdate
@@ -197,17 +197,17 @@ def register_callbacks(app, openai_client):
             return updated_options
         return current_options
     
-    def parse_uploaded_data_file(contents, filename):
-        if contents is not None: 
+    def parse_uploaded_data_file(uploaded_contents, uploaded_filename):
+        if uploaded_contents is not None: 
             #split the uploaded file into content and filename
-            content_type, content_string = contents.split(',') 
+            content_type, content_string = uploaded_contents.split(',') 
             #decode the content string
             decoded = base64.b64decode(content_string)
             try:
-                if 'csv' in filename:
+                if 'csv' in uploaded_filename:
                     # Assume that the user uploaded a CSV file
                     df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-                elif 'xls' in filename:
+                elif 'xls' in uploaded_filename:
                     # Assume that the user uploaded an excel file
                     df = pd.read_excel(io.BytesIO(decoded))
                 else: 
@@ -220,3 +220,19 @@ def register_callbacks(app, openai_client):
                     'There was an error processing this file.'
                 ])
             return df
+        
+    @app.callback(
+        Output('output-data-upload', 'children'),
+        [Input('upload-data', 'contents')],
+        [State('upload-data', 'filename')]
+    )
+    def update_output(uploaded_contents, uploaded_filename):
+        if uploaded_contents is not None:
+            children = [
+                parse_uploaded_data_file(uploaded_contents, uploaded_filename)
+            ]
+            return children
+        else:
+            return html.Div([
+                'Drag and drop or select a file to upload.'
+            ])
