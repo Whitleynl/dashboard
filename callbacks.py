@@ -2,7 +2,7 @@ import os
 import re
 import ast
 import matplotlib
-matplotlib.use('Agg') # interactive display
+matplotlib.use('TkAgg') # interactive display
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
@@ -91,8 +91,8 @@ def load_and_inspect_csv(file_path):
         
         # Check for unique values in categorical columns
         # print("\nUnique values in categorical columns:")
-        for column in df.select_dtypes(include=['object']).columns:
-            print(f"{column}: {df[column].unique()}")
+        # for column in df.select_dtypes(include=['object']).columns:
+            # print(f"{column}: {df[column].unique()}")
         
         # Display descriptive statistics for numerical columns
         # print("\nDescriptive statistics for numerical columns:")

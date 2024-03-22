@@ -1,4 +1,6 @@
 from dash import dcc, html
+from dash.dependencies import Input, Output
+
 
 initial_projects = ['Project A']
 
@@ -39,7 +41,7 @@ def app_layout():
                 dcc.Input(
                     id='user-input',
                     type='text',
-                    placeholder='How can Querri help you today?',                    
+                    placeholder='How can Querri help you today?',                   
                     style={
                         #increase font size:
                         'fontSize': '18px',
@@ -49,7 +51,7 @@ def app_layout():
                         'paddingLeft': '20px', 
                         'border': '1px solid #ccc', 
                         'outline': 'none', 
-                        'margin': '20px auto 0 auto', 
+                        'margin-bottom': '10px', 
                         'display': 'block', 
                         'boxSizing': 'border-box', 
                         'position': 'absolute', 
@@ -73,25 +75,24 @@ def app_layout():
                     'cursor': 'pointer', 
                     'position': 'absolute', 
                     'right': '144px', 
-                    'bottom': '20px',
+                    'bottom': '30px',
                     'zIndex': 1
                 }
             ),
             
             # Output to display model response
-            html.Div(id='output-plots', style={'marginTop': '100px', 'zIndex': 0})  # Chat response
-        ], style={
-            'display': 'flex', 
-            'flexDirection': 'column',
-            'alignItems': 'center', 
-            'position': 'fixed', 
-            'bottom': '0', 
-            'left': '292px', #Adjust if you do not like the white gap on the left 
-            'right': '0', 
-            'backgroundColor': '#394349',
-            'height': '1080px'
-        }),
-
-    ])
+            html.Div(id='output-plots', style={'position': 'relative', 'top': '50px', 'zIndex': 0})  # Chat response
+                ], style={
+                    'display': 'flex', 
+                    'flexDirection': 'column',
+                    'alignItems': 'center', 
+                    'position': 'fixed', 
+                    'bottom': '0', 
+                    'left': '292px', #Adjust if you do not like the white gap on the left 
+                    'right': '0', 
+                    'backgroundColor': '#394349',
+                    'height': '1080px'
+                }),
+            ])
 
     return layout

@@ -1,0 +1,4 @@
+/* styles.css */
+.input-style ::placeholder {
+    color: black; /* Change the color to black */
+}
