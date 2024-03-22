@@ -63,7 +63,7 @@ def app_layout():
 
             # Submit Button
             html.Img(
-                src='https://cdn-icons-png.flaticon.com/128/10610/10610564.png',
+                src = 'assets/enter_arrow.png',
                 id='submit-button',
                 n_clicks=0,
                  style={

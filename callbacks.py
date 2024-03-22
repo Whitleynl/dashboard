@@ -182,12 +182,12 @@ def register_callbacks(app, openai_client):
             ])
             '''
 
-    @app.callback(
+    """@app.callback(
         Output('project-dropdown', 'options'),
         Input('submit-new-project-button', 'n_clicks'),
         State('new-project-input', 'value'),
         State('project-dropdown', 'options')
-    )
+    )"""
     def add_new_project(n_clicks, new_project_name, current_options):
         if n_clicks > 0 and new_project_name:
             new_project_option = {'label': new_project_name, 'value': new_project_name}
