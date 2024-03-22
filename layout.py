@@ -36,7 +36,7 @@ def app_layout():
                 id='upload-data',
                 children=html.Div([
                     'Drag and Drop or ',
-                    html.A('Select Files')
+                    html.Button('Select Files')
                 ]),
                 style={
                     'width': '100%',
