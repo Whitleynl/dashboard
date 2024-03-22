@@ -2,7 +2,7 @@ import os
 import re
 import ast
 import matplotlib
-matplotlib.use('TkAgg') # interactive display
+matplotlib.use('Agg') # interactive display
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
@@ -10,6 +10,21 @@ from dash import html, dcc
 
 # file path for the ai
 file_path = os.path.join(os.getcwd(), 'data', 'student_math_clean.csv')
+
+
+# Define the extract_steps function to parse the model response
+def extract_message(response):
+    # Define regular expression pattern to match the message format
+    pattern = r'What this code does:(.*?)\d+\.'
+
+    # Extract the message using regular expression
+    match = re.search(pattern, response, re.DOTALL)
+
+    if match:
+        message = match.group(1).strip()
+        return message
+    else:
+        return "Message not found in response."
 
 # The big code cleaning function
 def clean_code_string(code_string):
@@ -129,6 +144,33 @@ def register_callbacks(app, openai_client):
 
     def generate_response(n_clicks, user_input, selected_project):
         if n_clicks > 0:
+            # Append the desired string to the user input
+            # Ask to not use plt.show()
+            # ask for functions 
+            user_input = f"""{user_input}
+              Write your code in python and describe what you did. 
+              You MUST use 'What this code does:' format when describing the steps you did.
+              Here is an example of what I want,
+                 What this code does:
+                    1. It loads the dataset from the specified file path.
+
+                    2. It selects the necessary columns from the DataFrame.
+
+                    3. It converts all categorical variables into numerical values using `LabelEncoder`.
+
+                    4. It standardizes the dataset to have mean=0 and variance=1 which is a requirement
+                    for many machine learning algorithms.
+
+                    5. It performs t-SNE on the processed dataset to reduce its dimensionality to 2, 
+                    suitable for graphical representation.
+
+                    6. It converts the result into a new DataFrame dedicated for t-SNE result, then
+                    generates a scatterplot from the DataFrame to visualize the distribution of 
+                    student data in the 2D t-SNE space.
+            """
+
+            # print(user_input)
+
             user_message = {"role": "user", "content": user_input}
 
             completion_response = openai_client.chat.completions.create(
@@ -136,8 +178,13 @@ def register_callbacks(app, openai_client):
                 messages=[user_message],
             )
             model_response = completion_response.choices[0].message.content
+
             # extract the code to run from this response
             extracted_code = model_response
+
+            # Printing the steps 
+            message = extract_message(extracted_code)
+            print(message)
 
             # clean the code 
             cleaned_code = clean_code_string(extracted_code)
