@@ -35,7 +35,7 @@ def app_layout():
             dcc.Upload(
                 id='upload-data',
                 children=html.Div([
-                    html.P('Drag and Drop or Click Anywhere to Select Files')
+                    html.Button('Select Files', className='btn-primary', style={'color': 'white', 'fontSize': '2opx'}), html.P('Or Drag and Drop', style={'color': 'white', 'fontSize': '2opx'}),
                 ]),
                 style={
                     'width': '100%',
