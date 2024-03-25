@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 import ast
@@ -6,7 +7,9 @@ matplotlib.use('Agg') # interactive display
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
-from dash import html, dcc
+from dash import html, dcc, dash_table
+import base64
+import io
 
 # file path for the ai
 file_path = os.path.join(os.getcwd(), 'data', 'student_math_clean.csv')
@@ -135,7 +138,7 @@ def load_and_inspect_csv(file_path):
 file_path = 'data/student_math_clean.csv'
 load_and_inspect_csv(file_path)
 
-def register_callbacks(app, openai_client):
+def register_callbacks(app, openai_client): 
     @app.callback(
         Output('output-plots', 'children'),
         [Input('submit-button', 'n_clicks')],
@@ -187,15 +190,15 @@ def register_callbacks(app, openai_client):
             print(message)
 
             # clean the code 
-            cleaned_code = clean_code_string(extracted_code)
+            cleaned_code = clean_code_string(extracted_code) 
 
-            if cleaned_code is None:
+            if cleaned_code is None: 
                 raise PreventUpdate # Don't update the app if the code cleanup fails  
 
             # run the cleaned code using the exec function
-            exec_global = {}
+            exec_global = {} 
             try: 
-                exec(cleaned_code, exec_global)
+                exec(cleaned_code, exec_global) 
             except Exception as e:
                 print(f"Error in execution: {e}")
                 raise PreventUpdate
@@ -242,3 +245,47 @@ def register_callbacks(app, openai_client):
             return updated_options
         return current_options
     
+    #parse_contents function. Maybe it doesn't belong in this file but I'm just trying to get it to work. 
+    def parse_contents(contents, filename, data):
+        content_type, content_string = contents.split(',')
+        decoded = base64.b64decode(content_string)
+        try:
+            if 'csv' in filename:
+                # Assume that the user uploaded a CSV file
+                df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+            elif 'xls' in filename:
+                # Assume that the user uploaded an excel file
+                df = pd.read_excel(io.BytesIO(decoded))
+        except Exception as e:
+            print(e)
+            return html.Div([
+                'There was an error processing this file.'
+            ])
+            
+        return html.Div([
+            html.H5(filename),
+            html.H6(datetime.datetime.fromtimestamp(data)),
+            dash_table.DataTable(
+                data=df.to_dict('records'),
+                columns=[{'name': i, 'id': i} for i in df.columns]
+            ),
+            html.Hr(),
+            html.Div('Raw Content'),
+            html.Pre(contents[0:200] + '...', style={
+                'whiteSpace': 'pre-wrap',
+                'wordBreak': 'break-all'
+            })
+        ])
+    @app.callback(
+        Output('output-data-upload', 'children'),
+        Input('upload-data', 'contents'),
+        State('upload-data', 'filename'),
+        State('upload-data', 'last_modified')
+    )
+    def update_output(list_of_contents, list_of_names, list_of_dates):
+        if list_of_contents is not None:
+            children = [
+                parse_contents(c, n, d) for c, n, d in
+                zip(list_of_contents, list_of_names, list_of_dates)]
+            return children
+        return None

@@ -6,7 +6,7 @@ from callbacks import register_callbacks
 
 
 # Initialize Dash app
-app = dash.Dash(__name__) 
+app = dash.Dash(__name__, external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css']) 
 app.layout = app_layout()
 
 # Retrieve API key from environment variable
