@@ -179,12 +179,12 @@ def familyRomanticRelationship(studentCsv):
 
 
 
-Using T-sne, create a graph using the csv file stored in file_path = os.path.join(os.getcwd(), 'data', 'student_math_clean.csv'). Use columns
- from this student_id,school,sex,age,address_type,family_size,parent_status,mother_education,father_education,mother_job,father_job,school_choice_reason,
- guardian,travel_time,studytime,class_failures,school_support,family_support,extra_paid_classes,activities,nursery_school,higher_ed,internet_access
- ,romantic_relationship,family_relationship,free_time,social,weekday_alcohol,weekend_alcohol,health,absences,grade_1,grade_2,final_grade
- to do so. Make sure to check if the columns are numeric or not before you try and work with them. Here is some python code to help you decide on
- how to format your responce: 
+Using T-sne, create a graph using the csv file. Use columns
+from this list "student_id,school,sex,age,address_type,family_size,parent_status,mother_education,father_education,mother_job,father_job,school_choice_reason,
+guardian,travel_time,studytime,class_failures,school_support,family_support,extra_paid_classes,activities,nursery_school,higher_ed,internet_access
+,romantic_relationship,family_relationship,free_time,social,weekday_alcohol,weekend_alcohol,health,absences,grade_1,grade_2,final_grade"
+to do so. Make sure to check if the columns are numeric or not before you try and work with them. Here is some examples of python code to help you decide on
+how to generate your responce: 
 
 def schoolSupportVsFamilySupport(file_path):
     df = pd.read_csv(file_path)
@@ -202,6 +202,38 @@ def schoolSupportVsFamilySupport(file_path):
 
     # Optionally, customize the layout further
     fig.update_layout(xaxis_title='School Support', yaxis_title='Average Final Grade')
+    return fig
+
+def freetimeVsSocial(studentCsv):
+    df = pd.read_csv(studentCsv)
+    
+    # Create a scatter plot using Plotly Express
+    fig = px.scatter(df, x='free_time', y='social', 
+                     title='Free Time vs. Social Activity',
+                     labels={'free_time': 'Free Time', 'social': 'Social Activity'},
+                     hover_data=['free_time', 'social'])  # Customize hover data if needed
+
+    # Optionally, customize the layout further
+    fig.update_layout(xaxis_title='Free Time', yaxis_title='Social Activity')
+    return fig
+
+def internetAccessDistribution(studentCsv):
+    df = pd.read_csv(studentCsv)
+    
+    # Convert internet access counts to a DataFrame for Plotly Express compatibility
+    internet_counts = df['internet_access'].value_counts().reset_index()
+    internet_counts.columns = ['Internet Access', 'Number of Students']
+    
+    # Create a pie chart using Plotly Express
+    fig = px.pie(internet_counts, names='Internet Access', values='Number of Students',
+                 title='Internet Access of Students',
+                 color='Internet Access',  # Optional: color segments by internet access
+                 color_discrete_sequence=['lightblue', 'lightcoral'])  # Custom colors
+
+    # Optionally, customize the layout further
+    fig.update_traces(textinfo='percent+label')
+    fig.update_layout(showlegend=True)
+
     return fig
 
 Please ensure that the graph effectively represents something of meaning revolving around the csv file and the relationship 

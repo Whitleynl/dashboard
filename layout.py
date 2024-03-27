@@ -37,7 +37,7 @@ def app_layout():
             dcc.Upload(
                 id='upload-data',
                 children=html.Div([
-                    html.Button('Select Files', className='btn-primary', style={'color': 'white', 'fontSize': '2opx'}), html.P('Or Drag and Drop', style={'color': 'white', 'fontSize': '2opx'}),
+                    html.Button('Select Files', className='btn-primary', style={'color': 'white', 'fontSize': '20px'}), html.P('Or Drag and Drop', style={'color': 'white', 'fontSize': '20px'}),
                 ]),
                 style={
                     'width': '100%',
@@ -52,7 +52,16 @@ def app_layout():
                 },
                 multiple=True
             ),
-            html.Div(id='output-data-upload'),
+            html.Div(id='output-data-upload', 
+                    style={
+                        'margin': '20px',
+                        'padding': '20px',  # Add padding
+                        'overflowX': 'auto',
+                        'maxHeight': '700px',
+                        'overflowY': 'auto',
+                        'font-size': '14px',
+                        'width': '1000px'
+                    }),
         ]),
 
         html.Div([

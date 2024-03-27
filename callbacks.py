@@ -214,7 +214,7 @@ def register_callbacks(app, openai_client):
             plots = []
             for plot_name, plot_function in plot_functions.items():
                 # call the plot function to generate plot
-                plot_figure = plot_function()
+                plot_figure = plot_function() # add parameter for file here?
 
                 # Update the figure property of the graph component
                 graph_id = f'plot-{plot_name}'
@@ -225,12 +225,6 @@ def register_callbacks(app, openai_client):
                 ]))
 
             return plots
-            '''
-            return html.Div([
-                html.H4(f"Code Executed Successfully!"),
-                html.P("Check the dashboard for the output.")
-            ])
-            '''
 
     """@app.callback(
         Output('project-dropdown', 'options'),
@@ -263,19 +257,30 @@ def register_callbacks(app, openai_client):
             ])
             
         return html.Div([
-            html.H5(filename),
-            html.H6(datetime.datetime.fromtimestamp(data)),
             dash_table.DataTable(
                 data=df.to_dict('records'),
-                columns=[{'name': i, 'id': i} for i in df.columns]
+                columns=[{'name': i, 'id': i} for i in df.columns],
+                style_table={
+                    'overflowX': 'auto',  # Horizontal scroll
+                    'border': '1px solid #e0e0e0',  # Add border
+                    'borderRadius': '5px',  # Add rounded corners
+                    'boxShadow': '0 4px 8px 0 rgba(0,0,0,0.05)',  # Add shadow
+                    'fontFamily': 'Arial, sans-serif',  # Change font
+                },
+                style_header={
+                    'backgroundColor': '#f2f2f2',  # Header background color
+                    'fontWeight': 'bold',  # Header font weight
+                },
+                style_cell={
+                    'textAlign': 'left',  # Cell text alignment
+                    'fontFamily': 'Arial, sans-serif',  # Change font
+                    'padding': '8px',  # Add padding
+                },
+                # Add more styling as needed
             ),
             html.Hr(),
-            html.Div('Raw Content'),
-            html.Pre(contents[0:200] + '...', style={
-                'whiteSpace': 'pre-wrap',
-                'wordBreak': 'break-all'
-            })
-        ])
+        ], style={'margin': '20px'})  # Add margin around the div
+            
     @app.callback(
         Output('output-data-upload', 'children'),
         Input('upload-data', 'contents'),
