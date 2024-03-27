@@ -89,7 +89,7 @@ def app_layout():
                     'cursor': 'pointer', 
                     'position': 'absolute', 
                     'right': '144px', 
-                    'bottom': '30px',
+                    'bottom': '20px',
                     'zIndex': 1
                 }
             )
