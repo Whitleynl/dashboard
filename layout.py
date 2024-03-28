@@ -83,6 +83,7 @@ def app_layout():
                     'bottom': '20px', 
                     'left': '50%', 
                     'transform': 'translateX(-50%)',
+                    'lineHeight': '60px', 
                     'zIndex': 1
                 }
             ),
