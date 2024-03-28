@@ -71,7 +71,7 @@ def app_layout():
                 style={
                     'fontSize': '18px',
                     'width': 'calc(100% - 290px)',
-                    'height': '60px',
+                    'height': '70px', # i increased this by 10px because i haven't figured out how to make it grow as the user types
                     'borderRadius': '25px', 
                     'paddingLeft': '20px', 
                     'border': '1px solid #ccc', 
@@ -99,12 +99,14 @@ def app_layout():
                     'position': 'absolute', 
                     'right': '144px', 
                     'bottom': '20px',
+                    'display': 'flex',
+                    'alignItems': 'center', 
                     'zIndex': 1
                 }
             )
         ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}),
-
-        html.Div(id='output-plots', style={'marginTop': '100px', 'zIndex': 0})  # Chat response
+ # wrap output plots in a dcc loading component:
+        dcc.Loading(id="loading", children=[html.Div(id='output-plots', style={'marginTop': '100px', 'zIndex': 0})]),
     ], style={
         'display': 'flex', 
         'flexDirection': 'column',

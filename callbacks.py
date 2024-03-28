@@ -140,7 +140,7 @@ load_and_inspect_csv(file_path)
 
 def register_callbacks(app, openai_client): 
     @app.callback(
-        Output('output-plots', 'children'),
+        Output('output-plots', 'children', allow_duplicate=True),
         [Input('submit-button', 'n_clicks')],
         [State('user-input', 'value'), State('project-dropdown', 'value')]
     )
@@ -294,3 +294,16 @@ def register_callbacks(app, openai_client):
                 zip(list_of_contents, list_of_names, list_of_dates)]
             return children
         return None
+    #callback for loading component:
+    @app.callback(
+        Output('output-plots', 'children'),
+        Input('submit-button', 'n_clicks'),
+        State('user-input', 'value'),
+    )
+    def update_output_plots(n_clicks, input_value):
+        if not n_clicks:
+            raise PreventUpdate
+        return html.Div([
+            html.H4(f"Processing Complete"),
+            html.P(f"Received input: {input_value}"),
+            ])
