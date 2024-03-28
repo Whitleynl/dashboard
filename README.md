@@ -1,7 +1,7 @@
 # Automated Data Visualization Dashboard
 
 ## Description
-The Automated Data Visualization Dashboard is an advanced, web-based application designed to empower users to upload their data files and generate insightful data visualizations through natural language commands. Leveraging OpenAI's GPT for processing these commands, the application facilitates an intuitive interface for business analysts, data scientists, and anyone interested in exploring data through visualizations. It supports various data formats, including CSV and Excel, and allows for the dynamic execution of Python code to transform, analyze, and visualize data.
+The Automated Data Visualization Dashboard is a web-based application designed to empower users to upload their data files and generate insightful data visualizations through natural language commands. Using OpenAI's GPT for processing these commands, the application facilitates an intuitive interface for business analysts, data scientists, and anyone interested in exploring data through visualizations. It currently supports CSV and Excel files, and allows for the dynamic execution of Python code to analyze and visualize data.
 
 ## Installation
 
@@ -57,7 +57,7 @@ Key dependencies include Dash for the web framework, Pandas for data manipulatio
 
 ## Running Tests
 
-Currently, this project does not include a test suite. 
+This project does not include a test suite currently. 
 
 ## License
 // not sure about this 

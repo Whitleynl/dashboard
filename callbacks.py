@@ -16,15 +16,15 @@ file_path = os.path.join(os.getcwd(), 'data', 'student_math_clean.csv')
 
 
 # Define the extract_steps function to parse the model response
-def extract_message(response):
+def extract_message(response): 
     # Define regular expression pattern to match the message format
     pattern = r'What this code does:(.*?)\d+\.'
 
     # Extract the message using regular expression
-    match = re.search(pattern, response, re.DOTALL)
+    match = re.search(pattern, response, re.DOTALL) 
 
     if match:
-        message = match.group(1).strip()
+        message = match.group(1).strip() 
         return message
     else:
         return "Message not found in response."
