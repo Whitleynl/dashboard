@@ -65,9 +65,8 @@ def app_layout():
         ]),
 
         html.Div([
-            dcc.Input(
+            dcc.Textarea(
                 id='user-input',
-                type='text',
                 placeholder='How can Querri help you today?',                    
                 style={
                     'fontSize': '18px',

@@ -78,7 +78,7 @@ def clean_code_string(code_string):
 
     # Syntax validation (optional but recommended)
     try:
-        ast.parse(cleaned_code)
+        ast.parse(cleaned_code) 
 
         # Printing the parsed code in order to see what we are getting from the AI
         print(cleaned_code)
@@ -187,7 +187,7 @@ def register_callbacks(app, openai_client):
 
             # Printing the steps 
             message = extract_message(extracted_code)
-            print(message)
+            print(message) 
 
             # clean the code 
             cleaned_code = clean_code_string(extracted_code) 

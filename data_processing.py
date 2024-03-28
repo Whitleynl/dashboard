@@ -184,7 +184,7 @@ from this list "student_id,school,sex,age,address_type,family_size,parent_status
 guardian,travel_time,studytime,class_failures,school_support,family_support,extra_paid_classes,activities,nursery_school,higher_ed,internet_access
 ,romantic_relationship,family_relationship,free_time,social,weekday_alcohol,weekend_alcohol,health,absences,grade_1,grade_2,final_grade"
 to do so. Make sure to check if the columns are numeric or not before you try and work with them. Here is some examples of python code to help you decide on
-how to generate your responce: 
+how to generate your response: 
 
 def schoolSupportVsFamilySupport(file_path):
     df = pd.read_csv(file_path)
