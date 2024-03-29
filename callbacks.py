@@ -255,11 +255,11 @@ def register_callbacks(app, openai_client):
         Output('output-data-upload', 'children'),
         Input('upload-data', 'contents'),
         State('upload-data', 'filename'),
-        State('upload-data', 'last_modified')
+        State('upload-data', 'last_modified') 
     )
-    def update_output(list_of_contents, list_of_names, list_of_dates):
-        if list_of_contents is not None:
-            children = [
+    def update_output(list_of_contents, list_of_names, list_of_dates): # i think the new parameters will be: (contents, filename)
+        if list_of_contents is not None:                               # (maybe store the df using dcc.Store? it's for storing data temporarily i think)
+            children = [                                               # then the returned df gets passed to load_and_inspect_csv.
                 parse_contents(c, n, d) for c, n, d in
                 zip(list_of_contents, list_of_names, list_of_dates)
             ]
