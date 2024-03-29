@@ -179,66 +179,41 @@ def familyRomanticRelationship(studentCsv):
 
 
 
-Using T-sne, create a graph using the csv file. Use columns
-from this list "student_id,school,sex,age,address_type,family_size,parent_status,mother_education,father_education,mother_job,father_job,school_choice_reason,
-guardian,travel_time,studytime,class_failures,school_support,family_support,extra_paid_classes,activities,nursery_school,higher_ed,internet_access
-,romantic_relationship,family_relationship,free_time,social,weekday_alcohol,weekend_alcohol,health,absences,grade_1,grade_2,final_grade"
-to do so. Make sure to check if the columns are numeric or not before you try and work with them. Here is some examples of python code to help you decide on
-how to generate your response: 
+Using plolty, create a graph using the df we give you. Here is some examples of python code to help generate your response: 
 
-def schoolSupportVsFamilySupport(file_path):
-    df = pd.read_csv(file_path)
-    
-    # Assuming 'school_support' is a column indicating whether students received school support.
-    # If you also have a 'family_support' column and want to compare, you'd need to adjust the DataFrame grouping/aggregation accordingly.
-    supportAvg = df.groupby('school_support')['final_grade'].mean().reset_index()
+1.
+    import matplotlib.pyplot as plt
 
-    # Create a bar chart using Plotly Express
-    fig = px.bar(supportAvg, x='school_support', y='final_grade',
-                 title='School Support vs. Average Final Grade',
-                 labels={'school_support': 'School Support', 'final_grade': 'Average Final Grade'},
-                 color='school_support',  # This will color bars differently based on 'school_support' value
-                 barmode='group')  # Use 'group' for grouped bar chart, remove or set to 'stack' for stacked
+    def plot_matplotlib_bar(df):
+        plt.bar(df['category'], df['value'])
+        plt.xlabel('Categories')
+        plt.ylabel('Values')
+        plt.title('Bar Plot')
+        plt.xticks(rotation=45)
+        plt.show()
 
-    # Optionally, customize the layout further
-    fig.update_layout(xaxis_title='School Support', yaxis_title='Average Final Grade')
-    return fig
+2.
+    import seaborn as sns
 
-def freetimeVsSocial(studentCsv):
-    df = pd.read_csv(studentCsv)
-    
-    # Create a scatter plot using Plotly Express
-    fig = px.scatter(df, x='free_time', y='social', 
-                     title='Free Time vs. Social Activity',
-                     labels={'free_time': 'Free Time', 'social': 'Social Activity'},
-                     hover_data=['free_time', 'social'])  # Customize hover data if needed
+    def plot_seaborn_box(df):
+        sns.boxplot(x='category', y='value', data=df)
+        plt.xlabel('Categories')
+        plt.ylabel('Values')
+        plt.title('Box Plot')
+        plt.xticks(rotation=45)
+        plt.show()
 
-    # Optionally, customize the layout further
-    fig.update_layout(xaxis_title='Free Time', yaxis_title='Social Activity')
-    return fig
+3.
+    import plotly.express as px
 
-def internetAccessDistribution(studentCsv):
-    df = pd.read_csv(studentCsv)
-    
-    # Convert internet access counts to a DataFrame for Plotly Express compatibility
-    internet_counts = df['internet_access'].value_counts().reset_index()
-    internet_counts.columns = ['Internet Access', 'Number of Students']
-    
-    # Create a pie chart using Plotly Express
-    fig = px.pie(internet_counts, names='Internet Access', values='Number of Students',
-                 title='Internet Access of Students',
-                 color='Internet Access',  # Optional: color segments by internet access
-                 color_discrete_sequence=['lightblue', 'lightcoral'])  # Custom colors
+    def plot_plotly_line(df):
+        fig = px.line(df, x='x_values', y='y_values', title='Line Plot')
+        fig.update_layout(xaxis_title='X Axis Label', yaxis_title='Y Axis Label')
+        fig.show()
 
-    # Optionally, customize the layout further
-    fig.update_traces(textinfo='percent+label')
-    fig.update_layout(showlegend=True)
 
-    return fig
-
-Please ensure that the graph effectively represents something of meaning revolving around the csv file and the relationship 
-the students have based on their school and life. Make sure to import os in order to access the file. Along with this make sure
-that you are importing all of the neccessary packages as the code provided is just an example. 
+Please ensure that the graph effectively represents something of meaning revolving around the data frame.
+Along with this make sure that you are importing all of the neccessary packages as the code provided is just an example. 
 
 
 

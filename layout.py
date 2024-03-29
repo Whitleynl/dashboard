@@ -30,7 +30,7 @@ def app_layout():
             'color': 'black', 
             'padding': '20px',
             'textAlign': 'center',
-            'width': '250px'  # Adjust the width to match the darker grey container
+            'width': '250px'
             }),
 
         html.Div([
@@ -71,7 +71,7 @@ def app_layout():
                 style={
                     'fontSize': '18px',
                     'width': 'calc(100% - 290px)',
-                    'height': '70px', # i increased this by 10px because i haven't figured out how to make it grow as the user types
+                    'height': '70px',
                     'borderRadius': '25px', 
                     'paddingLeft': '20px', 
                     'border': '1px solid #ccc', 

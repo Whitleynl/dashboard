@@ -11,8 +11,6 @@ from dash import html, dcc, dash_table
 import base64
 import io
 
-# file path for the ai
-file_path = os.path.join(os.getcwd(), 'data', 'student_math_clean.csv')
 
 
 # Define the extract_steps function to parse the model response
@@ -94,30 +92,6 @@ def load_and_inspect_csv(file_path):
     try:
         # Load the CSV file into a DataFrame
         df = pd.read_csv(file_path)
-        
-        # Display basic information about the DataFrame
-        # print("DataFrame information:")
-        # print(df.info())
-        
-        # Display the first few rows of the DataFrame
-        # print("\nFirst few rows of the DataFrame:")
-        # print(df.head())
-        
-        # Check for any missing values in the DataFrame
-        # print("\nMissing values:")
-        # print(df.isnull().sum())
-        
-        # Check for unique values in categorical columns
-        # print("\nUnique values in categorical columns:")
-        # for column in df.select_dtypes(include=['object']).columns:
-            # print(f"{column}: {df[column].unique()}")
-        
-        # Display descriptive statistics for numerical columns
-        # print("\nDescriptive statistics for numerical columns:")
-        # print(df.describe())
-        
-        # Clean the 'studytime' column
-        # print("\nCleaning 'studytime' column...")
         studytime_mapping = {
             '0 to 2 hours': 1.0,
             '2 to 5 hours': 3.5,
@@ -126,17 +100,12 @@ def load_and_inspect_csv(file_path):
         }
         df['studytime'] = df['studytime'].map(studytime_mapping)
         
-        # print("\nProcessed 'studytime' column:")
-        # print(df['studytime'].unique())
-        
         print("\nData inspection completed.")
         
     except Exception as e:
         print(f"Error loading or inspecting the CSV file: {e}")
 
-# Example usage:
-file_path = 'data/student_math_clean.csv'
-load_and_inspect_csv(file_path)
+df = None
 
 def register_callbacks(app, openai_client): 
     @app.callback(
@@ -146,6 +115,8 @@ def register_callbacks(app, openai_client):
     )
 
     def generate_response(n_clicks, user_input, selected_project):
+        global df
+
         if n_clicks > 0:
             # Append the desired string to the user input
             # Ask to not use plt.show()
@@ -170,6 +141,9 @@ def register_callbacks(app, openai_client):
                     6. It converts the result into a new DataFrame dedicated for t-SNE result, then
                     generates a scatterplot from the DataFrame to visualize the distribution of 
                     student data in the 2D t-SNE space.
+            Also Make sure to not use plt.show() in your code and have a line of code at the end that actually executes the function.
+            You do not need to try to create a df, assume we already have one named df for you.
+            When running the function pass a dataframe called df as your paramater rather than a file.
             """
 
             # print(user_input)
@@ -196,7 +170,7 @@ def register_callbacks(app, openai_client):
                 raise PreventUpdate # Don't update the app if the code cleanup fails  
 
             # run the cleaned code using the exec function
-            exec_global = {} 
+            exec_global = {'df': df}
             try: 
                 exec(cleaned_code, exec_global) 
             except Exception as e:
@@ -211,27 +185,23 @@ def register_callbacks(app, openai_client):
                 raise PreventUpdate
             
             # Generate Plots
-            plots = []
-            for plot_name, plot_function in plot_functions.items():
-                # call the plot function to generate plot
-                plot_figure = plot_function() # add parameter for file here?
-
-                # Update the figure property of the graph component
-                graph_id = f'plot-{plot_name}'
-                app.layout.children.append(dcc.Graph(id=graph_id, figure=plot_figure))
-                plots.append(html.Div([
-                    html.H4(f"Here is your plot for ({plot_name}): "),
-                    dcc.Graph(id=graph_id)  # Embed the plot as dcc.Graph
+            plot_figures = []
+            for name, plot_function in plot_functions.items():
+                try:
+                    # Call the plot function with the global df
+                    plot_figure = plot_function(df)
+                    graph_id = f'plot-{name}'
+                    app.layout.children.append(dcc.Graph(id=graph_id, figure=plot_figure))
+                    plot_figures.append(html.Div([
+                        html.H4(f"Here is your plot for {name}: "),
+                        dcc.Graph(id=graph_id)  # Embed the plot as dcc.Graph
                 ]))
+                except Exception as e:
+                    print(f"Error generating plot: {e}")
+                    continue
 
-            return plots
+            return plot_figures
 
-    """@app.callback(
-        Output('project-dropdown', 'options'),
-        Input('submit-new-project-button', 'n_clicks'),
-        State('new-project-input', 'value'),
-        State('project-dropdown', 'options')
-    )"""
     def add_new_project(n_clicks, new_project_name, current_options):
         if n_clicks > 0 and new_project_name:
             new_project_option = {'label': new_project_name, 'value': new_project_name}
@@ -291,7 +261,12 @@ def register_callbacks(app, openai_client):
         if list_of_contents is not None:
             children = [
                 parse_contents(c, n, d) for c, n, d in
-                zip(list_of_contents, list_of_names, list_of_dates)]
+                zip(list_of_contents, list_of_names, list_of_dates)
+            ]
+            for child in children: 
+                if isinstance(child, pd.DataFrame):
+                    global df
+                    df = child
             return children
         return None
     #callback for loading component:
@@ -306,4 +281,4 @@ def register_callbacks(app, openai_client):
         return html.Div([
             html.H4(f"Processing Complete"),
             html.P(f"Received input: {input_value}"),
-            ])
+            ]) 
