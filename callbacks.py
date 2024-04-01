@@ -3,7 +3,7 @@ import os
 import re
 import ast
 import matplotlib
-matplotlib.use('Agg') # interactive display
+matplotlib.use('TkAgg') # interactive display
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
@@ -119,31 +119,60 @@ def register_callbacks(app, openai_client):
 
         if n_clicks > 0:
             # Append the desired string to the user input
-            # Ask to not use plt.show()
-            # ask for functions 
             user_input = f"""{user_input}
-              Write your code in python and describe what you did. 
-              You MUST use 'What this code does:' format when describing the steps you did.
-              Here is an example of what I want,
-                 What this code does:
-                    1. It loads the dataset from the specified file path.
+                Please generate Python code that creates three different types
+                of graphs (scatter plot, bar chart, and line chart) using Plotly.
+                Assume that a DataFrame named 'df' is already available, 
+                containing the necessary data for plotting. Ensure that the code
+                is executable and does not rely on plt.show() to display the graphs.
+                    DataFrame 'df' structure:
+                        - student_id: A unique identifier assigned to each student.
+                        - school: Indicates the school the student attends, such as "GP".
+                        - sex: Represents the gender of the student, either "F" for female or "M" for male.
+                        - age: Denotes the age of the student in years.
+                        - address_type: Describes the type of address the student resides in, categorized as "Urban" or "Rural".
+                        - family_size: Indicates the size of the student's family.
+                        - parent_status: Describes the living arrangement of the student's parents, such as "Living together" or "Apart".
+                        - mother_education: Represents the educational level attained by the student's mother.
+                        - father_education: Represents the educational level attained by the student's father.
+                        - mother_job: Indicates the occupation of the student's mother.
+                        - father_job: Indicates the occupation of the student's father.
+                        - school_choice_reason: Describes the reason behind the student's choice of school or educational institution.
+                        - guardian: Indicates the guardian responsible for the student's welfare.
+                        - travel_time: Represents the time taken by the student to travel to school, categorized into time intervals.
+                        - class_failures: Indicates the number of past class failures experienced by the student.
+                        - school_support: Indicates whether the school provides additional support to the student.
+                        - family_support: Indicates whether the student receives support from their family.
+                        - extra_paid_classes: Indicates whether the student participates in extra paid classes.
+                        - activities: Indicates whether the student participates in extracurricular activities.
+                        - nursery_school: Indicates whether the student attended nursery school.
+                        - higher_ed: Indicates the student's aspiration for higher education.
+                        - internet_access: Indicates whether the student has access to the internet.
+                        - romantic_relationship: Indicates whether the student is involved in a romantic relationship.
+                        - family_relationship: Represents the quality of relationships within the student's family.
+                        - free_time: Indicates the amount of free time the student has after school.
+                        - social: Represents the student's level of social interaction with peers.
+                        - weekday_alcohol: Indicates the level of alcohol consumption by the student on weekdays.
+                        - weekend_alcohol: Indicates the level of alcohol consumption by the student on weekends.
+                        - health: Indicates the self-reported health status of the student.
+                        - absences: Indicates the number of absences recorded for the student.
+                        - grade_1: Represents the student's grade or performance in a certain subject or assessment.
+                        - grade_2: Represents another grade or performance measure for the student.
+                        - final_grade: Represents the final grade or overall performance of the student.
 
-                    2. It selects the necessary columns from the DataFrame.
-
-                    3. It converts all categorical variables into numerical values using `LabelEncoder`.
-
-                    4. It standardizes the dataset to have mean=0 and variance=1 which is a requirement
-                    for many machine learning algorithms.
-
-                    5. It performs t-SNE on the processed dataset to reduce its dimensionality to 2, 
-                    suitable for graphical representation.
-
-                    6. It converts the result into a new DataFrame dedicated for t-SNE result, then
-                    generates a scatterplot from the DataFrame to visualize the distribution of 
-                    student data in the 2D t-SNE space.
-            Also Make sure to not use plt.show() in your code and have a line of code at the end that actually executes the function.
-            You do not need to try to create a df, assume we already have one named df for you.
-            When running the function pass a dataframe called df as your paramater rather than a file.
+                    Your generated code should include:
+                        1. Function definitions for generating each type of graph.
+                        2. Incorporation of the DataFrame 'df' into each function
+                           as a parameter.
+                        3. Do not use df.show()/fig.show() to display the graphs, as these
+                           will be used in a dashboard.
+                        4. Descriptions of what the code is doing.
+                        5. You must make sure that your code is writen in valid
+                           python syntax.
+                        6. Check to see if columns are numerical or not.
+                        7. Your code is in valid python syntax. 
+                        8. Make sure to execute the functions at the end so the graphs will display.
+                        9. Make sure to only pass 'df' as a parameter.
             """
 
             # print(user_input)
@@ -215,6 +244,7 @@ def register_callbacks(app, openai_client):
         decoded = base64.b64decode(content_string)
         try:
             if 'csv' in filename:
+                global df
                 # Assume that the user uploaded a CSV file
                 df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
             elif 'xls' in filename:
@@ -226,6 +256,7 @@ def register_callbacks(app, openai_client):
                 'There was an error processing this file.'
             ])
             
+        '''    
         return html.Div([
             dash_table.DataTable(
                 data=df.to_dict('records'),
@@ -250,7 +281,7 @@ def register_callbacks(app, openai_client):
             ),
             html.Hr(),
         ], style={'margin': '20px'})  # Add margin around the div
-            
+            '''
     @app.callback(
         Output('output-data-upload', 'children'),
         Input('upload-data', 'contents'),
@@ -258,17 +289,14 @@ def register_callbacks(app, openai_client):
         State('upload-data', 'last_modified') 
     )
     def update_output(list_of_contents, list_of_names, list_of_dates): # i think the new parameters will be: (contents, filename)
-        if list_of_contents is not None:                               # (maybe store the df using dcc.Store? it's for storing data temporarily i think)
-            children = [                                               # then the returned df gets passed to load_and_inspect_csv.
+        if list_of_contents is not None:         
+            global df                      
+            children = [                                               
                 parse_contents(c, n, d) for c, n, d in
                 zip(list_of_contents, list_of_names, list_of_dates)
             ]
-            for child in children: 
-                if isinstance(child, pd.DataFrame):
-                    global df
-                    df = child
             return children
-        return None
+
     #callback for loading component:
     @app.callback(
         Output('output-plots', 'children'),

@@ -6,7 +6,7 @@ from callbacks import register_callbacks
 
 
 # Initialize Dash app
-app = dash.Dash(__name__, prevent_initial_callbacks=True) 
+app = dash.Dash(__name__, prevent_initial_callbacks=True, suppress_callback_exceptions=True) 
 
 app.layout = app_layout()
 
