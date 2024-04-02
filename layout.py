@@ -26,7 +26,7 @@ def app_layout():
             'top': '0', 
             'left': '0', 
             'bottom': '0', 
-            'backgroundColor': '#2D3339', 
+            'backgroundColor': '#1D2025', 
             'color': 'black', 
             'padding': '20px',
             'textAlign': 'center',
@@ -38,17 +38,18 @@ def app_layout():
             dcc.Upload(
                 id='upload-data',
                 children=html.Div([
-                    html.Button('Select Files', className='btn-primary', style={'color': 'white', 'fontSize': '20px'}), html.P('Or Drag and Drop', style={'color': 'white', 'fontSize': '20px'}),
+                    html.Button('Select Files', className='btn-primary', style={'color': 'white', 'fontSize': '20px', 'backgroundColor': '#1D2025', 'border': 'none', 'padding': '10px 20px', 'borderRadius': '5px', 'outline': 'none', 'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.2)'}), html.P('Or Drag and Drop Anywhere', style={'color': 'white', 'fontSize': '20px'}),
                 ]),
                 style={
                     'width': '100%',
                     'height': '60px',
+                    'backgroundColor': 'white',
                     'lineHeight': '60px',
                     'borderWidth': '1px',
                     'borderStyle': 'dashed',
                     'borderRadius': '5px',
                     'textAlign': 'center',
-                    'margin': '10px',
+                    'margin': '15px',
                     'cursor': 'pointer',
                 },
                 multiple=True
@@ -124,6 +125,7 @@ def app_layout():
     ], style={
         'display': 'flex', 
         'flexDirection': 'column',
+        'fontFamily': 'Open Sans, sans-serif',
         'alignItems': 'center', 
         'position': 'fixed',
         'top': '0',
