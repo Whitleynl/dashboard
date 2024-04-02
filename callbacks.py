@@ -2,11 +2,10 @@ import datetime
 import os
 import re
 import ast
-#import matplotlib
-#matplotlib.use('TkAgg') # interactive display
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
+import plotly.graph_objs as go
 from dash import html, dcc, dash_table
 import base64
 import io
@@ -120,8 +119,8 @@ def register_callbacks(app, openai_client):
         if n_clicks > 0:
             # Append the desired string to the user input
             user_input = f"""{user_input}
-                Please generate Python code that creates three different types
-                of graphs (scatter plot, bar chart, and line chart) using Plotly.
+                Please generate Python code that creates different types
+                of graphs (scatter plot, bar chart, and line chart for example) using Plotly.
                 Assume that a DataFrame named 'df' is already available, 
                 containing the necessary data for plotting. Ensure that the code
                 is executable and does not rely on plt.show() to display the graphs.
@@ -219,7 +218,64 @@ def register_callbacks(app, openai_client):
                 try:
                     # Call the plot function with the global df
                     plot_figure = plot_function(df)
-                    plot_figures.append(dcc.Graph(figure=plot_figure))
+
+                    # Style the graph
+                    plot_figure.update_layout(
+                        plot_bgcolor='#2d2d2d',  # Dark gray background
+                        paper_bgcolor='#333333',  # Slightly lighter background
+                        font=dict(
+                            family='Arial',  # font
+                            size=14,
+                            color='#d9d9d9'  # Light gray font color
+                        ),
+                        title=dict(
+                            text=f'Graph {name}',
+                            x=0.5,
+                            font=dict(
+                                family='Arial',
+                                size=18,
+                                color='#ffffff'  # White title color
+                            )
+                        ),
+                        margin=dict(l=60, r=60, t=60, b=60),
+                        xaxis=dict(
+                            gridcolor='#555555',  # Subtle grid line color
+                            gridwidth=0.5
+                        ),
+                        yaxis=dict(
+                            gridcolor='#555555',
+                            gridwidth=0.5
+                        )
+                    )
+
+                    # Additional styling for specific plot types
+                    if isinstance(plot_figure, go.Scatter):
+                        plot_figure.update_traces(marker=dict(color='#ff8c00'))  # Orange marker color for scatter plots
+
+                    elif isinstance(plot_figure, go.Bar):
+                        plot_figure.update_traces(marker=dict(color='#5599ff'))  # Light blue bar color for bar charts
+
+                    # add style for other types of charts
+
+                    # Wrap the styled plot figure in a styled container
+                    plot_figures.append(
+                        html.Div(style={
+                            'backgroundColor': '#2d2d2d',
+                            'padding': '20px',
+                            'borderRadius': '5px',
+                            'boxShadow': '0 0 10px rgba(0, 0, 0, 0.3)'
+                    }, children=[
+                        html.H4(f"Graph {name}", style={
+                            'color': '#ffffff',
+                            'marginBottom': '10px'
+                        }),
+                        dcc.Graph(figure=plot_figure, style={
+                            'width': '100%',
+                            'height': '400px',
+                            'backgroundColor': '#333333',
+                            'color': '#d9d9d9'
+                        })
+                    ]))
                 except Exception as e:
                     print(f"Error generating plot: {e}")
                     continue
@@ -292,7 +348,7 @@ def register_callbacks(app, openai_client):
         State('upload-data', 'filename'),
         State('upload-data', 'last_modified') 
     )
-    def update_output(list_of_contents, list_of_names, list_of_dates): # i think the new parameters will be: (contents, filename)
+    def update_output(list_of_contents, list_of_names, list_of_dates):
         if list_of_contents is not None:         
             global df                      
             children = [                                               

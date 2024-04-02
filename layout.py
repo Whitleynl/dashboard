@@ -105,8 +105,21 @@ def app_layout():
                 }
             )
         ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}),
- # wrap output plots in a dcc loading component:
-        dcc.Loading(id="loading", children=[html.Div(id='output-plots', style={'marginTop': '100px', 'zIndex': 0})]),
+        
+        dcc.Loading(id="loading", children=[
+            #Graph Styling
+            html.Div(id='output-plots', style={
+                'marginTop': '100px',
+                'marginBottom': '100px',
+                'zIndex': 0,
+                'display': 'grid',
+                'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
+                'gridGap': '20px',
+                'maxWidth': '1200px',
+                'margin': '0 auto',
+                'padding': '20px'
+            })
+        ]),
     ], style={
         'display': 'flex', 
         'flexDirection': 'column',

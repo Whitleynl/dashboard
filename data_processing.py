@@ -1,6 +1,7 @@
 '''
-Using plolty, create a graph using a data frame named 'df' that we are going to give you. 
-Here is some examples of python code that I wrote in order to help generate your response: 
+Using plolty, create 4 graphs using a data frame named 'df' that we are going to give you. 
+Here is some examples of python code that I wrote in order to help generate your response,
+keep in mind that these are only example. You are able to do more just like this: 
 
     import plotly.graph_objects as go
 
