@@ -30,7 +30,8 @@ def app_layout():
             'color': 'black', 
             'padding': '20px',
             'textAlign': 'center',
-            'width': '250px'
+            'width': '250px',
+            'height': '100vh',
             }),
 
         html.Div([
@@ -59,7 +60,7 @@ def app_layout():
                         'overflowX': 'auto',
                         'maxHeight': '700px',
                         'overflowY': 'auto',
-                        'font-size': '14px',
+                        'fontSize': '14px',
                         'width': '1000px'
                     }),
         ]),
@@ -124,12 +125,13 @@ def app_layout():
         'display': 'flex', 
         'flexDirection': 'column',
         'alignItems': 'center', 
-        'position': 'fixed', 
-        'bottom': '0', 
+        'position': 'fixed',
+        'top': '0',
+        'bottom': '0',
         'left': '292px', 
         'right': '0', 
         'backgroundColor': '#394349',
-        'height': '1080px'
+        'minHeight': '100vh',
     })
 
     return layout
