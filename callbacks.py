@@ -2,8 +2,8 @@ import datetime
 import os
 import re
 import ast
-import matplotlib
-matplotlib.use('TkAgg') # interactive display
+#import matplotlib
+#matplotlib.use('TkAgg') # interactive display
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
@@ -219,17 +219,21 @@ def register_callbacks(app, openai_client):
                 try:
                     # Call the plot function with the global df
                     plot_figure = plot_function(df)
-                    graph_id = f'plot-{name}'
-                    app.layout.children.append(dcc.Graph(id=graph_id, figure=plot_figure))
-                    plot_figures.append(html.Div([
-                        html.H4(f"Here is your plot for {name}: "),
-                        dcc.Graph(id=graph_id)  # Embed the plot as dcc.Graph
-                ]))
+                    plot_figures.append(dcc.Graph(figure=plot_figure))
                 except Exception as e:
                     print(f"Error generating plot: {e}")
                     continue
 
             return plot_figures
+        
+    @app.callback(
+        Output('output-plots', 'children', allow_duplicate=True),
+        [Input('generate-response', 'data')]
+    )
+    def update_plots(plot_figures):
+        if plot_figures is None:
+            return []
+        return plot_figures
 
     def add_new_project(n_clicks, new_project_name, current_options):
         if n_clicks > 0 and new_project_name:
