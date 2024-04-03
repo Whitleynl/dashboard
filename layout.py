@@ -7,11 +7,11 @@ initial_projects = ['Project A']
 def app_layout():
     layout = html.Div([
         html.Div([
-            html.Img(src="https://querri.com/hubfs/Querri%20Logo.svg", 
+            html.Img(src="/assets/QuerriTransLogo.svg",
             style={
-                'width': '80%', 
+                'width': '100%', 
                 'display': 'block', 
-                'margin': '20px auto'
+                'margin': '5px auto'
                 }),
             dcc.Dropdown(
                 options=[{'label': project, 'value': project} for project in initial_projects],
