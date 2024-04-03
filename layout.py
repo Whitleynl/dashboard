@@ -38,7 +38,17 @@ def app_layout():
             dcc.Upload(
                 id='upload-data',
                 children=html.Div([
-                    html.Button('Select Files', className='btn-primary', style={'color': 'white', 'fontSize': '20px', 'backgroundColor': '#1D2025', 'border': 'none', 'padding': '10px 20px', 'borderRadius': '5px', 'outline': 'none', 'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.2)'}), html.P('Or Drag and Drop Anywhere', style={'color': 'white', 'fontSize': '20px'}),
+                    html.Button('Select Files', className='btn-primary', 
+                                style={'color': 'white', 
+                                       'fontSize': '20px', 
+                                       'backgroundColor': '#1D2025', 
+                                       'border': 'none', 
+                                       'padding': '10px 20px', 
+                                       'borderRadius': '5px', 
+                                       'outline': 'none', 
+                                       'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.2)'
+                                    }), 
+                    html.P('Or Drag and Drop Anywhere', style={'color': 'white', 'fontSize': '20px'}),
                 ]),
                 style={
                     'width': '100%',
@@ -67,7 +77,7 @@ def app_layout():
         ]),
 
         html.Div([
-            dcc.Textarea(
+            dcc.Input(
                 id='user-input',
                 placeholder='How can Querri help you today?',                    
                 style={
@@ -111,7 +121,7 @@ def app_layout():
         dcc.Loading(id="loading", children=[
             #Graph Styling
             html.Div(id='output-plots', style={
-                'marginTop': '100px',
+                'marginTop': '50px',
                 'marginBottom': '100px',
                 'zIndex': 0,
                 'display': 'grid',

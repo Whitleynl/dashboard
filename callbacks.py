@@ -1,15 +1,15 @@
+# IMPORTS
 import datetime
 import os
 import re
 import ast
+import base64
+import io
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
 from dash import html, dcc, dash_table
-import base64
-import io
-
 
 
 # Define the extract_steps function to parse the model response
@@ -172,6 +172,7 @@ def register_callbacks(app, openai_client):
                         7. Your code is in valid python syntax. 
                         8. Make sure to execute the functions at the end so the graphs will display.
                         9. Make sure to only pass 'df' as a parameter.
+                        10. Have descriptive axis titles 
             """
 
             # print(user_input)
@@ -249,13 +250,14 @@ def register_callbacks(app, openai_client):
                     )
 
                     # Additional styling for specific plot types
+                    # Not working I dont think
                     if isinstance(plot_figure, go.Scatter):
                         plot_figure.update_traces(marker=dict(color='#ff8c00'))  # Orange marker color for scatter plots
 
                     elif isinstance(plot_figure, go.Bar):
                         plot_figure.update_traces(marker=dict(color='#5599ff'))  # Light blue bar color for bar charts
 
-                    # add style for other types of charts
+                    # add style for other types of charts (Histogram, Pie, Heatmap, Box plot, Violin, ...., ect.)
 
                     # Wrap the styled plot figure in a styled container
                     plot_figures.append(
@@ -316,32 +318,6 @@ def register_callbacks(app, openai_client):
                 'There was an error processing this file.'
             ])
             
-        '''    
-        return html.Div([
-            dash_table.DataTable(
-                data=df.to_dict('records'),
-                columns=[{'name': i, 'id': i} for i in df.columns],
-                style_table={
-                    'overflowX': 'auto',  # Horizontal scroll
-                    'border': '1px solid #e0e0e0',  # Add border
-                    'borderRadius': '5px',  # Add rounded corners
-                    'boxShadow': '0 4px 8px 0 rgba(0,0,0,0.05)',  # Add shadow
-                    'fontFamily': 'Arial, sans-serif',  # Change font
-                },
-                style_header={
-                    'backgroundColor': '#f2f2f2',  # Header background color
-                    'fontWeight': 'bold',  # Header font weight
-                },
-                style_cell={
-                    'textAlign': 'left',  # Cell text alignment
-                    'fontFamily': 'Arial, sans-serif',  # Change font
-                    'padding': '8px',  # Add padding
-                },
-                # Add more styling as needed
-            ),
-            html.Hr(),
-        ], style={'margin': '20px'})  # Add margin around the div
-            '''
     @app.callback(
         Output('output-data-upload', 'children'),
         Input('upload-data', 'contents'),
@@ -370,3 +346,49 @@ def register_callbacks(app, openai_client):
             html.H4(f"Processing Complete"),
             html.P(f"Received input: {input_value}"),
             ]) 
+    
+    # Callback to display DataFrame when user types prompt
+    @app.callback(
+        Output('output-data-upload', 'children', allow_duplicate=True),
+        Input('user-input', 'value')
+    )
+
+    def display_dataframe_while_typing(user_input):
+        if df is not None and user_input:
+            return html.Div([
+                dash_table.DataTable(
+                    data=df.to_dict('records'),
+                    columns=[{'name': i, 'id': i} for i in df.columns],
+                    style_table={
+                        'overflowX': 'auto',  # Horizontal scroll
+                        'border': '1px solid #e0e0e0',  # Add border
+                        'borderRadius': '5px',  # Add rounded corners
+                        'boxShadow': '0 4px 8px 0 rgba(0,0,0,0.05)',  # Add shadow
+                        'fontFamily': 'Arial, sans-serif',
+                    },
+                    style_header={
+                        'backgroundColor': '#f2f2f2',  # Header background color
+                        'fontWeight': 'bold',
+                    },
+                    style_cell={
+                        'textAlign': 'left',  # Cell text alignment
+                        'fontFamily': 'Arial, sans-serif',
+                        'padding': '8px',
+                    },
+                    # Add more styling as needed
+                ),
+                html.Hr(),
+            ], style={'margin': '20px'})  # Add margin around the div
+        else:
+            return None
+
+    # Callback to clear DataFrame when user clicks submit
+    @app.callback(
+        Output('output-data-upload', 'children', allow_duplicate=True),
+        [Input('submit-button', 'n_clicks')]
+    )
+    def clear_dataframe_on_submit(n_clicks):
+        if n_clicks:
+            return None
+        else:
+            raise PreventUpdate
