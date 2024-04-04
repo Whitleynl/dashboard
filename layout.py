@@ -2,7 +2,7 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 
 
-initial_projects = ['Project A']
+initial_projects = ['Student Data']
 
 def app_layout():
     layout = html.Div([
@@ -20,7 +20,17 @@ def app_layout():
                 searchable=False,
                 clearable=False
             ),
-            
+            html.Button('Create A New Dashboard', 
+                        id='add-dashboard-button', 
+                        n_clicks=0, 
+                        style={
+                            'marginTop': '10px',
+                            'fontWeight': 'bold',
+                            'backgroundColor': '#white', 
+                            'textAlign': 'center',
+                            'fontSize': '12px',
+                            'borderRadius': '20px',
+                        }),
         ], style={
             'position': 'fixed', 
             'top': '0', 
@@ -32,6 +42,7 @@ def app_layout():
             'textAlign': 'center',
             'width': '250px',
             'height': '100vh',
+            'fontWeight': 'bold',
             }),
         
         html.Div([
@@ -50,14 +61,15 @@ def app_layout():
                                            'borderRadius': '5px', 
                                            'cursor': 'pointer',
                                            'outline': 'none', 
+                                           'textDecoration': 'underline'
                                            }), 
                         html.P('Or Drag and Drop', style={'color': '#1D2025','fontSize': '20px'}),
-                    ], style={
-                        'display': 'flex', 
-                        'justifyContent': 'column', 
-                        'alignItems': 'center', 
-                        'padding': '20px',
-                        'cursor': 'pointer',
+                        ], style={
+                            'display': 'flex', 
+                            'justifyContent': 'column', 
+                            'alignItems': 'center', 
+                            'padding': '20px',
+                            'cursor': 'pointer',
                         }),
                     style={
                         'display': 'flex',
@@ -66,6 +78,7 @@ def app_layout():
                         'width': '100%',
                         'height': '120px',
                         'backgroundColor': 'lightgray',
+                        'opacity': '0.3',
                         'lineHeight': '60px',
                         'borderWidth': '1.5px',
                         'borderStyle': 'dashed',
@@ -100,7 +113,7 @@ def app_layout():
                     id='user-input',
                     placeholder='How can Querri help you today?',                    
                     style={
-                        'fontSize': '18px',
+                        'fontSize': '20px',
                         'width': 'calc(100% - 290px)',
                         'height': '70px',
                         'borderRadius': '25px', 
@@ -119,7 +132,7 @@ def app_layout():
                     }
                 ),
                 html.Img(
-                    src = 'assets/enter_arrow.png',
+                    src = 'assets/chat-gpt.png',
                     id='submit-button',
                     n_clicks=0,
                     style={
@@ -128,8 +141,8 @@ def app_layout():
                         'borderRadius': '25px', 
                         'cursor': 'pointer', 
                         'position': 'absolute', 
-                        'right': '144px', 
-                        'bottom': '20px',
+                        'right': '155px', 
+                        'bottom': '25px',
                         'display': 'flex',
                         'alignItems': 'center', 
                         'zIndex': 1
