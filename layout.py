@@ -145,7 +145,7 @@ def app_layout():
                     }
                 ),
                 html.Img(
-                    src = 'assets/chat-gpt.png',
+                    src = 'assets/Q.svg',
                     id='submit-button',
                     n_clicks=0,
                     style={
