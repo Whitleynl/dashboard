@@ -44,7 +44,20 @@ def app_layout():
             'height': '100vh',
             'fontWeight': 'bold',
             }),
-        
+            dcc.Loading(id="loading", children=[
+                #Graph Styling
+                html.Div(id='output-plots', style={
+                    'marginTop': '50px',
+                    'marginBottom': '100px',
+                    'zIndex': 1,
+                    'display': 'grid',
+                    'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
+                    'gridGap': '20px',
+                    'maxWidth': '1200px',
+                    'margin': '0 auto',
+                    'padding': '20px'
+                })
+            ]),
         html.Div([
 
             html.Div([
@@ -150,20 +163,6 @@ def app_layout():
                 )
             ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}),
             
-            dcc.Loading(id="loading", children=[
-                #Graph Styling
-                html.Div(id='output-plots', style={
-                    'marginTop': '50px',
-                    'marginBottom': '100px',
-                    'zIndex': 0,
-                    'display': 'grid',
-                    'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
-                    'gridGap': '20px',
-                    'maxWidth': '1200px',
-                    'margin': '0 auto',
-                    'padding': '20px'
-                })
-            ]),
         ], style={
             'display': 'flex', 
             'flexDirection': 'column',
