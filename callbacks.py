@@ -172,7 +172,8 @@ def register_callbacks(app, openai_client):
                         7. Your code is in valid python syntax. 
                         8. Make sure to execute the functions at the end so the graphs will display.
                         9. Make sure to only pass 'df' as a parameter.
-                        10. Have descriptive axis titles 
+                        10. Make sure to color the graphs to compliment orange and dark grey tones (use more than just orange). 
+                        11. Make sure to have a descriptive title for the graphs.
             """
 
             # print(user_input)

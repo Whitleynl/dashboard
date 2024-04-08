@@ -44,14 +44,14 @@ def app_layout():
             'height': '100vh',
             'fontWeight': 'bold',
             }),
-            dcc.Loading(id="loading", children=[
+            dcc.Loading(id="loading", type='dot', color='orange', children=[
                 #Graph Styling
                 html.Div(id='output-plots', style={
                     'marginTop': '50px',
                     'marginBottom': '100px',
                     'zIndex': 1,
                     'display': 'grid',
-                    'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
+                    'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))', # 3 graphs pre line? 
                     'gridGap': '20px',
                     'maxWidth': '1200px',
                     'margin': '0 auto',
