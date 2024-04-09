@@ -19,7 +19,7 @@ cd automated-data-visualization-dashboard
 ```
 
 3. Install the required dependencies:
-// not sure about this right now 
+Key dependencies include Dash for the web framework, Pandas for data manipulation, Matplotlib and Plotly for data visualization, and the OpenAI Python client for natural language processing.
 
 ## Environment Setup
 
@@ -53,14 +53,11 @@ Navigate to the URL indicated in the terminal to access the dashboard.
 
 ## Dependencies
 
-Key dependencies include Dash for the web framework, Pandas for data manipulation, Matplotlib and Plotly for data visualization, and the OpenAI Python client for natural language processing. A full list of dependencies is available in the `requirements.txt` file. // << we should make this
-
-## Running Tests
-
-This project does not include a test suite currently. 
+Key dependencies include Dash for the web framework, Pandas for data manipulation, Matplotlib and Plotly for data visualization, and the OpenAI Python client for natural language processing.
 
 ## License
-// not sure about this 
+
+The Automated Data Visualization Dashboard is released under the [MIT License](https://opensource.org/licenses/MIT). See the [LICENSE](https://github.com/Whitleynl/dashboard/blob/main/LICENSE) file for more details.
 
 ## Contact Information
 
