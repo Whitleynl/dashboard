@@ -2,6 +2,7 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 
 
+
 initial_projects = ['Student Data']
 
 def app_layout():
@@ -51,9 +52,9 @@ def app_layout():
                     'marginBottom': '100px',
                     'zIndex': 1,
                     'display': 'grid',
-                    'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))', # 3 graphs pre line? 
+                    'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
                     'gridGap': '20px',
-                    'maxWidth': '1200px',
+                    'maxWidth': '1600px',
                     'margin': '0 auto',
                     'padding': '20px'
                 })
@@ -61,7 +62,7 @@ def app_layout():
         html.Div([
 
             html.Div([
-                dcc.Upload(
+                dcc.Upload( # make upload box disapear when uploading
                     id='upload-data',
                     children=html.Div([
                         html.Button('Select Files', className='btn-primary', 

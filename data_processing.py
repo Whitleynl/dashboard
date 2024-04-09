@@ -1,51 +1,9 @@
 '''
-Using plolty, create 4 graphs using a data frame named 'df' that we are going to give you. 
-Here is some examples of python code that I wrote in order to help generate your response,
-keep in mind that these are only example. I want you to make 4: 
-
-    import plotly.graph_objects as go
-
-    def scatter_plot(df):
-        """
-        This function generates a scatter plot using the first two numerical columns of the DataFrame.
-        """
-        numeric_cols = df.select_dtypes(include=['number']).columns
-        if len(numeric_cols) < 2:
-            raise ValueError("DataFrame must contain at least two numerical columns for a scatter plot.")
-        
-        fig = go.Figure(data=go.Scatter(x=df[numeric_cols[0]], y=df[numeric_cols[1]], mode='markers'))
-        fig.update_layout(title='Scatter Plot', xaxis_title='X Axis', yaxis_title='Y Axis')
-        return fig
-
-    def bar_chart(df):
-        """
-        This function generates a bar chart using the first numerical column of the DataFrame.
-        """
-        numeric_cols = df.select_dtypes(include=['number']).columns
-        if len(numeric_cols) < 1:
-            raise ValueError("DataFrame must contain at least one numerical column for a bar chart.")
-        
-        fig = go.Figure(data=go.Bar(x=df[numeric_cols[0]], y=df.index))
-        fig.update_layout(title='Bar Chart', xaxis_title='X Axis', yaxis_title='Y Axis')
-        return fig
-
-    def line_chart(df):
-        """
-        This function generates a line chart using all numerical columns of the DataFrame.
-        """
-        numeric_cols = df.select_dtypes(include=['number']).columns
-        if len(numeric_cols) == 0:
-            raise ValueError("DataFrame must contain at least one numerical column for a line chart.")
-        
-        fig = go.Figure()
-        for col in numeric_cols:
-            fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=col))
-        fig.update_layout(title='Line Chart', xaxis_title='X Axis', yaxis_title='Y Axis')
-        return fig
+Using plolty, create 6 graphs using a data frame named 'df' that we are going to give you. 
 
 
-Please ensure that the graph effectively represents something of meaning revolving around the data frame.
-Along with this make sure that you are importing all of the neccessary packages as the code provided is just an example. 
+
+
 
 
 
