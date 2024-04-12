@@ -219,6 +219,7 @@ def register_callbacks(app, openai_client):
                             return fig
                 Please ensure that the graph effectively represents something of meaning revolving around the data frame.
                 Along with this make sure that you are importing all of the neccessary packages as the code provided is just an example. 
+                remember that 'df' is a DataFrame that is supplied by the user. It is what is used to generate the graphs.
             """
 
             # print(user_input)
