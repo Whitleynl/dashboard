@@ -1,5 +1,5 @@
 '''
-Using plolty, create 6 graphs using a data frame named 'df' that we are going to give you. 
+Using plotly, create 6 graphs using a data frame named 'df' that is supplied. 
 
 
 

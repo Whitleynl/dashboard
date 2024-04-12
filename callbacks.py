@@ -118,8 +118,9 @@ def register_callbacks(app, openai_client):
 
         if n_clicks > 0:
             # Append the desired string to the user input
-            user_input = f"""{user_input}
-                Please generate Python code that creates different types
+            user_input = f"""I want you to generate a set of plotly graphs based on the user's request. In this input, the variable 'df' will be provided. That is the data you will use to generate the graphs. The user request is as follows:
+        {user_input} 
+                Generate Python code that creates different types
                 of graphs (scatter plot, bar chart, and line chart for example) using Plotly.
                 Assume that a DataFrame named 'df' is already available, 
                 containing the necessary data for plotting. Ensure that the code
