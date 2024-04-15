@@ -118,8 +118,10 @@ def register_callbacks(app, openai_client):
 
         if n_clicks > 0:
             # Append the desired string to the user input
-            user_input = f"""I want you to generate a set of plotly graphs based on the user's request. In this input, the variable 'df' will be provided. That is the data you will use to generate the graphs. The user request is as follows:
-        {user_input} 
+            user_input = f"""I want you to generate a set of plotly graphs based on the user's request. 
+                             In this input, the variable 'df' will be provided. That is the data you 
+                             will use to generate the graphs. The user request is as follows:
+                {user_input} 
                 Generate Python code that creates different types
                 of graphs (scatter plot, bar chart, and line chart for example) using Plotly.
                 Assume that a DataFrame named 'df' is already available, 
@@ -181,33 +183,51 @@ def register_callbacks(app, openai_client):
                 
                     import plotly.graph_objects as go
                         def scatter_plot(df):
+                            '''
+                            Generates a scatter plot using the first two numerical columns of the DataFrame.
                             
-                            # This function generates a scatter plot using the first two numerical columns of the DataFrame.
+                            Args:
+                            df (DataFrame): Input DataFrame
                             
+                            Returns:
+                            fig (plotly.graph_objs.Figure): Scatter plot figure
+                            '''
                             numeric_cols = df.select_dtypes(include=['number']).columns
                             if len(numeric_cols) < 2:
                                 raise ValueError("DataFrame must contain at least two numerical columns for a scatter plot.")
                             
                             fig = go.Figure(data=go.Scatter(x=df[numeric_cols[0]], y=df[numeric_cols[1]], mode='markers'))
-                            fig.update_layout(title='Scatter Plot', xaxis_title='X Axis', yaxis_title='Y Axis')
+                            fig.update_layout(title='Scatter Plot', xaxis_title=numeric_cols[0], yaxis_title=numeric_cols[1])
                             return fig
 
                         def bar_chart(df):
+                            '''
+                            Generates a bar chart using the first numerical column of the DataFrame.
                             
-                            # This function generates a bar chart using the first numerical column of the DataFrame.
-                        
+                            Args:
+                            df (DataFrame): Input DataFrame
+                            
+                            Returns:
+                            fig (plotly.graph_objs.Figure): Bar chart figure
+                            '''
                             numeric_cols = df.select_dtypes(include=['number']).columns
                             if len(numeric_cols) < 1:
                                 raise ValueError("DataFrame must contain at least one numerical column for a bar chart.")
                             
                             fig = go.Figure(data=go.Bar(x=df[numeric_cols[0]], y=df.index))
-                            fig.update_layout(title='Bar Chart', xaxis_title='X Axis', yaxis_title='Y Axis')
+                            fig.update_layout(title='Bar Chart', xaxis_title=numeric_cols[0], yaxis_title='Index')
                             return fig
 
                         def line_chart(df):
+                            '''
+                            Generates a line chart using all numerical columns of the DataFrame.
                             
-                            # This function generates a line chart using all numerical columns of the DataFrame.
+                            Args:
+                            df (DataFrame): Input DataFrame
                             
+                            Returns:
+                            fig (plotly.graph_objs.Figure): Line chart figure
+                            '''
                             numeric_cols = df.select_dtypes(include=['number']).columns
                             if len(numeric_cols) == 0:
                                 raise ValueError("DataFrame must contain at least one numerical column for a line chart.")
@@ -215,8 +235,9 @@ def register_callbacks(app, openai_client):
                             fig = go.Figure()
                             for col in numeric_cols:
                                 fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=col))
-                            fig.update_layout(title='Line Chart', xaxis_title='X Axis', yaxis_title='Y Axis')
+                            fig.update_layout(title='Line Chart', xaxis_title='Index', yaxis_title='Values')
                             return fig
+
                 Please ensure that the graph effectively represents something of meaning revolving around the data frame.
                 Along with this make sure that you are importing all of the neccessary packages as the code provided is just an example. 
                 remember that 'df' is a DataFrame that is supplied by the user. It is what is used to generate the graphs.
