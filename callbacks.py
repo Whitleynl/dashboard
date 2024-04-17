@@ -86,8 +86,9 @@ def clean_code_string(code_string):
 
     return cleaned_code
 
-def load_and_inspect_csv(df):
+def load_and_inspect_csv(file_path):
     try:
+        df = pd.read_csv(file_path)
         # Print a message to the console
         print("DataFrame created successfully based on the user's file upload.")
         
@@ -338,22 +339,27 @@ def register_callbacks(app, openai_client):
         raise PreventUpdate
 
     # Function to parse the contents of the uploaded file
-    def parse_contents(contents, filename):
+    def parse_contents(contents, filename, data):
         global df  # Declare df as a global variable
 
         content_type, content_string = contents.split(',')
 
         decoded = base64.b64decode(content_string)
         try:
-            # Assume that the user uploaded a CSV file
-            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+            if 'csv' in filename:
+                global df
+                # Assume that the user uploaded a CSV file
+                df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
             
+            elif 'xls' in filename:
+                # Assume that the user uploaded an excel file
+                df = pd.read_excel(io.BytesIO(decoded))
             # Print the first few rows of the DataFrame to inspect the data
             print("First few rows of the DataFrame:")
             print(df.head())
             
             # Load and inspect the CSV file
-            load_and_inspect_csv(df)
+           # load_and_inspect_csv(df)
         except Exception as e:
             print(e)
             return html.Div([
@@ -370,17 +376,16 @@ def register_callbacks(app, openai_client):
 
 
 
-     # Define callback for file upload
-    @app.callback(Output('output-data-upload', 'children'),
-                  [Input('upload-data', 'contents')],
-                  [State('upload-data', 'filename')])
-    def update_output(contents, filename):
-        if contents is not None:
-            children = [
-                parse_contents(contents, filename)
+    @app.callback(
+        Output('output-data-upload', 'children'),
+        Input('upload-data', 'contents'),
+        State('upload-data', 'filename'),
+        State('upload-data', 'last_modified') 
+    )
+    def update_output(list_of_contents, list_of_names, list_of_dates):
+        if list_of_contents is not None:         
+            global df                      
+            children = [                                               
+                parse_contents(c, n, d) for c, n, d in
+                zip(list_of_contents, list_of_names, list_of_dates)
             ]
-            # Adding a print lines for content, filename, and a DataFrame head to debug possible errors.
-            print(contents)
-            print(filename)
-            print(df.head())
-            return children
