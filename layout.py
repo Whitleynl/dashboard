@@ -50,33 +50,30 @@ def app_layout():
             html.Div(id='output-plots', style={
                 'marginTop': '50px',
                 'marginBottom': '100px',
-                'zIndex': 1,
+                'zIndex': 2,
                 'display': 'grid',
                 'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
                 'gridGap': '20px',
-                'maxWidth': '1600px',
                 'margin': '0 auto',
                 'padding': '20px'
             }),
             html.Div(id='output-statistics', style={
                 'marginTop': '50px',
                 'marginBottom': '100px',
-                'zIndex': 1,
+                'zIndex': 2,
                 'display': 'grid',
                 'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
                 'gridGap': '20px',
-                'maxWidth': '1600px',
                 'margin': '0 auto',
                 'padding': '20px'
             }),
             html.Div(id='output-info', style={
                 'marginTop': '50px',
                 'marginBottom': '100px',
-                'zIndex': 1,
+                'zIndex': 2,
                 'display': 'grid',
                 'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
                 'gridGap': '20px',
-                'maxWidth': '1600px',
                 'margin': '0 auto',
                 'padding': '20px'
             }),

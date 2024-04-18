@@ -333,8 +333,13 @@ def register_callbacks(app, openai_client):
                         info_components.append(html.Div([html.P(name), html.Pre(info_output)]))
                 except Exception as e:
                     print(f"Error generating information '{name}': {e}")
-
-            return plot_figures, stats_components, info_components
+            '''
+            return three lists, each containing the dash components for the plots, statistics, and information, respectively.
+            these components will then be displayed in the corresponding dash components output-plots, output-statistics, and output-info. 
+            Make sure to replace the plot_figure1, plot_figure2, stats_output, and info_output variables with the actual outputs from your code generation logic.
+            By returning the Dash components directly, they will be rendered within the designated areas in the user interface, rather than opening in new browser windows.
+            '''
+        
 
         raise PreventUpdate
 

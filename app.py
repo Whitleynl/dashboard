@@ -24,4 +24,6 @@ openai_client = OpenAI(api_key=OPENAI_API_KEY)
 register_callbacks(app, openai_client) 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, dev_tools_ui=False) # Get rid of <> button ?
+    app.run_server(debug=True) # Get rid of <> button ?
+    #    app.run_server(debug=True, dev_tools_ui=False) # Get rid of <> button ?
+
