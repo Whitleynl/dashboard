@@ -340,8 +340,10 @@ def register_callbacks(app, openai_client):
             By returning the Dash components directly, they will be rendered within the designated areas in the user interface, rather than opening in new browser windows.
             '''
         
+        
+        return plot_figures, stats_components, info_components #not sure about this 
 
-        raise PreventUpdate
+        raise PreventUpdate #also forgot where this should go
 
     # Function to parse the contents of the uploaded file
     def parse_contents(contents, filename, data):
@@ -355,6 +357,7 @@ def register_callbacks(app, openai_client):
                 global df
                 # Assume that the user uploaded a CSV file
                 df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+                load_and_inspect_csv(df) #added this. not sure about it. 
             
             elif 'xls' in filename:
                 # Assume that the user uploaded an excel file
@@ -373,6 +376,7 @@ def register_callbacks(app, openai_client):
 
         return html.Div([
             html.H5(filename),
+            html.Div(id='upload-success-message', children="This file has been processed successfully."),
             dash_table.DataTable(
                 data=df.head().to_dict('records'),
                 columns=[{'name': i, 'id': i} for i in df.columns]

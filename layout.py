@@ -119,7 +119,7 @@ def app_layout():
                     'cursor': 'pointer',
                 },
                 multiple=True
-            ),
+            ),            
             html.Div(id='output-data-upload', 
                         style={
                             'margin': '20px',
@@ -131,6 +131,8 @@ def app_layout():
                             'width': '1000px'
                 }),
         ]),
+            html.Div(id='upload-success-message', children="", style={'color': 'green', 'fontSize': '20px', 'fontWeight': 'bold', 'minHeight': '40px', 'minWidth': '300px', 'position': 'relative','zIndex': '2'}),
+
         
         html.Div([
             dcc.Input(
