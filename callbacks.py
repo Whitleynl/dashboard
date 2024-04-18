@@ -1,98 +1,43 @@
-import datetime
-import os
-import re
-import ast
 import base64
 import io
+import re
 import pandas as pd
-from dash.exceptions import PreventUpdate
-from dash.dependencies import Input, Output, State
+from dash import dcc, html, Input, Output, State, dash_table, exceptions
 import plotly.graph_objs as go
-from dash import html, dcc, dash_table
+from dash.exceptions import PreventUpdate
 
+# Initialized dataframe
 df = None
 
-# Define the extract_steps function to parse the model response
+# Function to extract messages from the model response
 def extract_message(response):
-    # Define regular expression pattern to match the message format
     pattern = r'What this code does:(.*?)\d+\.'
-
-    # Extract the message using regular expression
     match = re.search(pattern, response, re.DOTALL)
+    return match.group(1).strip() if match else "Message not found in response."
 
-    if match:
-        message = match.group(1).strip()
-        return message
-    else:
-        return "Message not found in response."
-
-# The big code cleaning function
+# Function to clean the extracted code string
 def clean_code_string(code_string):
-    # Trim leading and trailing whitespace to simplify detection
-    trimmed_string = code_string.strip()
+    code_string = code_string.strip()  # Trim whitespace
+    # Remove invalid characters
+    code_string = re.sub(r'[^\x20-\x7E\xA0-\uFFFF\t\n]', '', code_string)
+    # Extract code using regex
+    patterns = [
+        r'```(?:[a-zA-Z]+\s)?([\s\S]+?)```',
+        r'```(?:[a-zA-Z]+\s)?([\s\S]+)',
+        r'([\s\S]+)```',
+        r'^[\'"]([\s\S]+)[\'"]$'
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, code_string)
+        if match:
+            return match.group(1).strip()
+    return code_string  # Return the code string if no pattern matches
 
-    # Attempt to remove any non printable or otherwise invalid characters. This pattern keeps:
-    #   - \x20-\x7E: The range of printable ASCII characters.
-    #   - \xA0-\uFFFF: The range of printable characters in the UTF-8 character set.
-    #   - \t: Horizontal tab.
-    #   - \n: Newline.
-    trimmed_string = re.sub(r'[^\x20-\x7E\xA0-\uFFFF\t\n]', '', trimmed_string)
-
-    # Initialize cleaned_code with None to check later if we've extracted any code
-    cleaned_code = None
-
-    # 1. Check for full backtick blocks (```code```) and extract
-    # This regex accounts for optional language specifiers, like ```python
-    full_backtick_match = re.search(r'```(?:[a-zA-Z]+\s)?([\s\S]+?)```', trimmed_string)
-    if full_backtick_match:
-        cleaned_code = full_backtick_match.group(1)
-
-    # 2. If no full backtick block is found, check for leading backticks (```code)
-    # This also handles potential language specifiers after the backticks
-    if cleaned_code is None:
-        leading_backtick_match = re.match(r'```(?:[a-zA-Z]+\s)?([\s\S]+)', trimmed_string)
-        if leading_backtick_match:
-            cleaned_code = leading_backtick_match.group(1)
-
-    # 3. Check for trailing backticks (code```) and extract if no leading or full backtick was found
-    if cleaned_code is None:
-        trailing_backtick_match = re.match(r'([\s\S]+)```', trimmed_string)
-        if trailing_backtick_match:
-            cleaned_code = trailing_backtick_match.group(1)
-
-    # 4. Check for code wrapped in quotes and extract if no variations of backticks were found
-    if cleaned_code is None:
-        quote_match = re.fullmatch(r'^[\'"]([\s\S]+)[\'"]$', trimmed_string)
-        if quote_match:
-            cleaned_code = quote_match.group(1)
-
-    # If no patterns matched, consider the trimmed string as the code.
-    if cleaned_code is None:
-        cleaned_code = trimmed_string
-
-    # Remove any remaining leading/trailing whitespace
-    cleaned_code = cleaned_code.strip()
-
-    # Syntax validation (optional but recommended)
-    try:
-        ast.parse(cleaned_code)
-
-        # Printing the parsed code in order to see what we are getting from the AI
-        print(cleaned_code)
-
-    except SyntaxError as e:
-        print(f"Code cleanup failed. Extracted code block is not valid Python syntax. Error: {e}")
-        return None  # or handle as appropriate for your application
-
-    return cleaned_code
-
+# Function to load and inspect CSV files
 def load_and_inspect_csv(file_path):
+    global df
     try:
         df = pd.read_csv(file_path)
-        # Print a message to the console
-        print("DataFrame created successfully based on the user's file upload.")
-        
-        # Perform data inspection if needed
         studytime_mapping = {
             '0 to 2 hours': 1.0,
             '2 to 5 hours': 3.5,
@@ -100,31 +45,44 @@ def load_and_inspect_csv(file_path):
             '10 or more hours': 10.0
         }
         df['studytime'] = df['studytime'].map(studytime_mapping)
-
         print("Data inspection completed.")
-
     except Exception as e:
-        print(f"Error loading or inspecting the CSV file: {e}")
+        print(f"Error loading or inspecting CSV file: {e}")
 
-df = None
+# Function to parse the contents of the uploaded file
+def parse_contents(contents, filename):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    try:
+        if 'csv' in filename:
+            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+        elif 'xls' in filename:
+            df = pd.read_excel(io.BytesIO(decoded))
+        print(df.head())
+        return html.Div([
+            html.H5(filename),
+            html.Div(id='upload-success-message', children="File processed successfully."),
+            dash_table.DataTable(data=df.head().to_dict('records'), columns=[{'name': i, 'id': i} for i in df.columns])
+        ])
+    except Exception as e:
+        print(e)
+        return html.Div(['There was an error processing this file.'])
 
+# Register the app callbacks
 def register_callbacks(app, openai_client):
     @app.callback(
-        Output('output-plots', 'children', allow_duplicate=True),
-        Output('output-statistics', 'children', allow_duplicate=True),
-        Output('output-info', 'children', allow_duplicate=True),
+        [Output('output-plots', 'children', allow_duplicate=True),
+         Output('output-statistics', 'children', allow_duplicate=True),
+         Output('output-info', 'children', allow_duplicate=True)],
         [Input('submit-button', 'n_clicks')],
         [State('user-input', 'value'), State('project-dropdown', 'value')]
     )
-
     def generate_response(n_clicks, user_input, selected_project):
-        global df
-
         if n_clicks > 0:
-            user_input = f"""I want you to generate a set of plotly graphs, statistics, and additional information based on the user's request. 
-                            In this input, the variable 'df' will be provided. That is the data you will use to generate the outputs. The user request is as follows:
-            {user_input}
-            We want you to generate Python code that creates different types of graphs (scatter plot, bar chart, line chart, histogram, etc.). 
+            user_input = f"""i want you to generate a set of plotly graphs, statistics, and additional information 
+            based on the user's request. In this input, the variable 'df' will be provided. That is the data you will use 
+            to generate the plots and statistics. The user request is as follows: {user_input} 
+            I want you to generate python code that creates different types of graphs (scatter plot, bar chart, line chart, histogram, etc.). 
             Also, generate code to calculate relevant statistics (mean, median, standard deviation, etc.) and provide additional information
             (data descriptions, insights, etc.) based on the DataFrame 'df'. Assume that a DataFrame named 'df' is already available, containing
             the necessary data for plotting and analysis. Ensure that the code is executable and does not rely on plt.show() or similar functions
@@ -345,56 +303,18 @@ def register_callbacks(app, openai_client):
 
         raise PreventUpdate #also forgot where this should go
 
-    # Function to parse the contents of the uploaded file
-    def parse_contents(contents, filename, data):
-        global df  # Declare df as a global variable
-
-        content_type, content_string = contents.split(',')
-
-        decoded = base64.b64decode(content_string)
-        try:
-            if 'csv' in filename:
-                global df
-                # Assume that the user uploaded a CSV file
-                df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-                load_and_inspect_csv(df) #added this. not sure about it. 
-            
-            elif 'xls' in filename:
-                # Assume that the user uploaded an excel file
-                df = pd.read_excel(io.BytesIO(decoded))
-            # Print the first few rows of the DataFrame to inspect the data
-            print("First few rows of the DataFrame:")
-            print(df.head())
-            
-            # Load and inspect the CSV file
-           # load_and_inspect_csv(df)
-        except Exception as e:
-            print(e)
-            return html.Div([
-                'There was an error processing this file.'
-            ])
-
-        return html.Div([
-            html.H5(filename),
-            html.Div(id='upload-success-message', children="This file has been processed successfully."),
-            dash_table.DataTable(
-                data=df.head().to_dict('records'),
-                columns=[{'name': i, 'id': i} for i in df.columns]
-            )
-        ])
-
-
+        
+     
+        
+        
 
     @app.callback(
         Output('output-data-upload', 'children'),
         Input('upload-data', 'contents'),
         State('upload-data', 'filename'),
-        State('upload-data', 'last_modified') 
+        State('upload-data', 'last_modified')
     )
     def update_output(list_of_contents, list_of_names, list_of_dates):
-        if list_of_contents is not None:         
-            global df                      
-            children = [                                               
-                parse_contents(c, n, d) for c, n, d in
-                zip(list_of_contents, list_of_names, list_of_dates)
-            ]
+        if list_of_contents is not None:
+            children = [parse_contents(c, n) for c, n in zip(list_of_contents, list_of_names)]
+            return children
