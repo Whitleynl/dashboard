@@ -51,19 +51,35 @@ def load_and_inspect_csv(file_path):
 
 # Function to parse the contents of the uploaded file
 def parse_contents(contents, filename):
-    global df
+    global df  # Make sure to use the global df variable
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     try:
         if 'csv' in filename:
-            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+            # Create a StringIO object from decoded content and load into df
+            csv_stringio = io.StringIO(decoded.decode('utf-8'))
+            df = pd.read_csv(csv_stringio)
+            # Apply the mapping after loading the CSV into df
+            studytime_mapping = {
+                '0 to 2 hours': 1.0,
+                '2 to 5 hours': 3.5,
+                '5 to 10 hours': 7.5,
+                '10 or more hours': 10.0
+            }
+            df['studytime'] = df['studytime'].map(studytime_mapping)
+            print("DataFrame created and inspection completed.")
         elif 'xls' in filename:
+            # For Excel files, read directly into df
             df = pd.read_excel(io.BytesIO(decoded))
+        
         print(df.head())
         return html.Div([
             html.H5(filename),
             html.Div(id='upload-success-message', children="File processed successfully."),
-            dash_table.DataTable(data=df.head().to_dict('records'), columns=[{'name': i, 'id': i} for i in df.columns])
+            dash_table.DataTable(
+                data=df.head().to_dict('records'),
+                columns=[{'name': i, 'id': i} for i in df.columns]
+            )
         ])
     except Exception as e:
         print(e)
