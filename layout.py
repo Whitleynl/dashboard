@@ -99,6 +99,21 @@ def app_layout():
         'alignItems': 'center',
         'zIndex': 1
     }
+    
+    upload_success_style = {
+    'color': '#4CAF50',  # Green color for success messages
+    'backgroundColor': '#dff0d8',  # Light green background for better visibility
+    'fontSize': '16px',  # Sufficient size for readability
+    'fontWeight': 'bold',
+    'padding': '10px 20px',  # Padding to make the text more prominent
+    'borderRadius': '5px',  # Rounded corners for modern look
+    'border': '1px solid #c3e6cb',  # Subtle border matching the background
+    'boxShadow': '0 2px 4px rgba(0,0,0,0.2)',  # Soft shadow for 3D effect
+    'width': 'auto',  # Automatic width based on content
+    'margin': '10px auto',  # Center horizontally
+    'textAlign': 'center',  # Center text inside the div
+    'display': 'block',  # Block display to occupy its own space
+    }
 
     layout = html.Div([
         html.Div([
@@ -113,7 +128,8 @@ def app_layout():
             html.Button('Create A New Dashboard', id='add-dashboard-button', n_clicks=0, style={'marginTop': '10px', 'fontWeight': 'bold', 'backgroundColor': '#white', 'textAlign': 'center', 'fontSize': '12px', 'borderRadius': '20px'}),
         ], style=sidebar_style),
 
-        dcc.Loading(id="loading", type='dot', color='orange', children=[
+        dcc.Loading(id="loading", type='dot', color='orange', 
+            children=[
             html.Div(id='output-plots', style=content_style),
             html.Div(id='output-statistics', style=content_style),
             html.Div(id='output-info', style=content_style),
@@ -132,7 +148,7 @@ def app_layout():
             html.Div(id='output-data-upload', style=upload_data_style),
         ]),
 
-        html.Div(id='upload-success-message', children="", style={'color': 'green', 'fontSize': '20px', 'fontWeight': 'bold', 'minHeight': '40px', 'minWidth': '300px', 'position': 'relative', 'zIndex': '2'}),
+        html.Div(id='upload-success-message', children="", style=upload_success_style),
 
         html.Div([
             dcc.Input(id='user-input', placeholder='How can Querri help you today?', style=input_style),

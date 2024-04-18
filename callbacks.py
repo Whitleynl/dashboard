@@ -74,8 +74,6 @@ def parse_contents(contents, filename):
         
         print(df.head())
         return html.Div([
-            html.H5(filename),
-            html.Div(id='upload-success-message', children="File processed successfully."),
             dash_table.DataTable(
                 data=df.head().to_dict('records'),
                 columns=[{'name': i, 'id': i} for i in df.columns]
@@ -144,7 +142,7 @@ def register_callbacks(app, openai_client):
                 2. Function definitions for calculating statistics.
                 3. Function definitions for providing additional information.
                 4. Incorporation of the DataFrame 'df' ONLY into each function as a parameter.
-                5. Do not use df.show()/fig.show() to display the graphs, as these will be used in a dashboard.
+                5. Do not use df.show()/fig.show() to display the graphs, or any other function that will cause new windows to open.
                 6. Check to see if columns are numerical or not.
                 7. Make sure to execute the functions at the end so the graphs, statistics, and information will be generated.
                 8. Make sure to only pass 'df' as a parameter.
@@ -225,7 +223,7 @@ def register_callbacks(app, openai_client):
                 Please ensure that the graph effectively represents something of meaning revolving around the data frame.
                 Also remember that the graph functions should ONLY have 'df' as a parameter that is being passed to them.
                 Remember that 'df' is a DataFrame that is supplied by the user. It is what is used to generate the graphs.
-                This will be displayed in a dashboard so make sure to write the code in a maner that it can be ran to display. 
+                This will be displayed in a dashboard so make sure to not use df.show()/fig.show() or any function that will cause new windows to open. 
             """
 
             # print(user_input)
@@ -319,11 +317,16 @@ def register_callbacks(app, openai_client):
         return plot_figures, stats_components, info_components #not sure about this 
 
         raise PreventUpdate #also forgot where this should go
-
-        
-     
-        
-        
+  
+    @app.callback(
+        Output('upload-success-message', 'children'),
+        [Input('upload-data', 'contents')],
+        [State('upload-data', 'filename')]
+    )
+    def upload_success_message(contents, filename):
+        if contents:
+            return f'Upload Successful: {filename}'
+        return ''
 
     @app.callback(
         Output('output-data-upload', 'children'),
