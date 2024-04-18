@@ -51,6 +51,7 @@ def load_and_inspect_csv(file_path):
 
 # Function to parse the contents of the uploaded file
 def parse_contents(contents, filename):
+    global df
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     try:
