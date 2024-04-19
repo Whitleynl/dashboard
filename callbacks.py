@@ -1,15 +1,17 @@
+# IMPORTS
+import datetime
+import os
+import re
+import ast
 import base64
 import io
-from logging import info
-import re
 import pandas as pd
-from dash import dcc, html, Input, Output, State, dash_table, exceptions
-import plotly.graph_objs as go
 from dash.exceptions import PreventUpdate
+from dash.dependencies import Input, Output, State
+import plotly.graph_objs as go
+from dash import html, dcc, dash_table
 
-# Initialized dataframe
-global df
-df = None
+
 
 # Function to extract messages from the model response
 def extract_message(response):
@@ -17,27 +19,67 @@ def extract_message(response):
     match = re.search(pattern, response, re.DOTALL)
     return match.group(1).strip() if match else "Message not found in response."
 
-# Function to clean the extracted code string
 def clean_code_string(code_string):
-    code_string = code_string.strip()  # Trim whitespace
-    # Remove invalid characters
-    code_string = re.sub(r'[^\x20-\x7E\xA0-\uFFFF\t\n]', '', code_string)
-    # Extract code using regex
-    patterns = [
-        r'```(?:[a-zA-Z]+\s)?([\s\S]+?)```',
-        r'```(?:[a-zA-Z]+\s)?([\s\S]+)',
-        r'([\s\S]+)```',
-        r'^[\'"]([\s\S]+)[\'"]$'
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, code_string)
-        if match:
-            return match.group(1).strip()
-    return code_string  # Return the code string if no pattern matches
+    # Trim leading and trailing whitespace to simplify detection
+    trimmed_string = code_string.strip()
+
+    # Attempt to remove any non printable or otherwise invalid characters. This pattern keeps:
+    #   - \x20-\x7E: The range of printable ASCII characters.
+    #   - \xA0-\uFFFF: The range of printable characters in the UTF-8 character set.
+    #   - \t: Horizontal tab.
+    #   - \n: Newline.
+    trimmed_string = re.sub(r'[^\x20-\x7E\xA0-\uFFFF\t\n]', '', trimmed_string)
+
+    # Initialize cleaned_code with None to check later if we've extracted any code
+    cleaned_code = None
+
+    # 1. Check for full backtick blocks (```code```) and extract
+    # This regex accounts for optional language specifiers, like ```python
+    full_backtick_match = re.search(r'```(?:[a-zA-Z]+\s)?([\s\S]+?)```', trimmed_string)
+    if full_backtick_match:
+        cleaned_code = full_backtick_match.group(1)
+
+    # 2. If no full backtick block is found, check for leading backticks (```code)
+    # This also handles potential language specifiers after the backticks
+    if cleaned_code is None:
+        leading_backtick_match = re.match(r'```(?:[a-zA-Z]+\s)?([\s\S]+)', trimmed_string)
+        if leading_backtick_match:
+            cleaned_code = leading_backtick_match.group(1)
+
+    # 3. Check for trailing backticks (code```) and extract if no leading or full backtick was found
+    if cleaned_code is None:
+        trailing_backtick_match = re.match(r'([\s\S]+)```', trimmed_string)
+        if trailing_backtick_match:
+            cleaned_code = trailing_backtick_match.group(1)
+
+    # 4. Check for code wrapped in quotes and extract if no variations of backticks were found
+    if cleaned_code is None:
+        quote_match = re.fullmatch(r'^[\'"]([\s\S]+)[\'"]$', trimmed_string)
+        if quote_match:
+            cleaned_code = quote_match.group(1)
+
+    # If no patterns matched, consider the trimmed string as the code.
+    if cleaned_code is None:
+        cleaned_code = trimmed_string
+
+    # Remove any remaining leading/trailing whitespace
+    cleaned_code = cleaned_code.strip()
+
+    # Syntax validation (optional but recommended)
+    try:
+        ast.parse(cleaned_code) 
+
+        # Printing the parsed code in order to see what we are getting from the AI
+        print(cleaned_code)
+
+    except SyntaxError as e:
+        print(f"Code cleanup failed. Extracted code block is not valid Python syntax. Error: {e}")
+        return None  # or handle as appropriate for your application
+
+    return cleaned_code
 
 # Function to load and inspect CSV files
 def load_and_inspect_csv(file_path):
-    global df
     try:
         df = pd.read_csv(file_path)
         studytime_mapping = {
@@ -52,12 +94,12 @@ def load_and_inspect_csv(file_path):
         print(f"Error loading or inspecting CSV file: {e}")
 
 # Function to parse the contents of the uploaded file
-def parse_contents(contents, filename):
-    global df  # Make sure to use the global df variable
+def parse_contents(contents, filename, data):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     try:
         if 'csv' in filename:
+            global df
             # Create a StringIO object from decoded content and load into df
             csv_stringio = io.StringIO(decoded.decode('utf-8'))
             df = pd.read_csv(csv_stringio)
@@ -95,152 +137,133 @@ def register_callbacks(app, openai_client):
         [State('user-input', 'value'), State('project-dropdown', 'value')]
     )
     def generate_response(n_clicks, user_input, selected_project):
+        global df
+
         if n_clicks > 0:
-            user_input = f"""i want you to generate a set of plotly graphs, statistics, and additional information 
-            based on the user's request. In this input, the variable 'df' will be provided. That is the data you will use 
-            to generate the plots and statistics. The user request is as follows: {user_input} 
-            I want you to generate python code that creates different types of graphs (scatter plot, bar chart, line chart, histogram, etc.). 
-            Also, generate code to calculate relevant statistics (mean, median, standard deviation, etc.) and provide additional information
-            (data descriptions, insights, etc.) based on the DataFrame 'df'. Assume that a DataFrame named 'df' is already available, containing
-            the necessary data for plotting and analysis. Ensure that the code is executable and does not rely on plt.show() or similar functions
-            to display the graphs.
-            DataFrame 'df' structure:
-                - student_id: A unique identifier assigned to each student.
-                - school: Indicates the school the student attends, such as "GP".
-                - sex: Represents the gender of the student, either "F" for female or "M" for male.
-                - age: Denotes the age of the student in years.
-                - address_type: Describes the type of address the student resides in, categorized as "Urban" or "Rural".
-                - family_size: Indicates the size of the student's family.
-                - parent_status: Describes the living arrangement of the student's parents, such as "Living together" or "Apart".
-                - mother_education: Represents the educational level attained by the student's mother.
-                - father_education: Represents the educational level attained by the student's father.
-                - mother_job: Indicates the occupation of the student's mother.
-                - father_job: Indicates the occupation of the student's father.
-                - school_choice_reason: Describes the reason behind the student's choice of school or educational institution.
-                - guardian: Indicates the guardian responsible for the student's welfare.
-                - travel_time: Represents the time taken by the student to travel to school, categorized into time intervals.
-                - class_failures: Indicates the number of past class failures experienced by the student.
-                - school_support: Indicates whether the school provides additional support to the student.
-                - family_support: Indicates whether the student receives support from their family.
-                - extra_paid_classes: Indicates whether the student participates in extra paid classes.
-                - activities: Indicates whether the student participates in extracurricular activities.
-                - nursery_school: Indicates whether the student attended nursery school.
-                - higher_ed: Indicates the student's aspiration for higher education.
-                - internet_access: Indicates whether the student has access to the internet.
-                - romantic_relationship: Indicates whether the student is involved in a romantic relationship.
-                - family_relationship: Represents the quality of relationships within the student's family.
-                - free_time: Indicates the amount of free time the student has after school.
-                - social: Represents the student's level of social interaction with peers.
-                - weekday_alcohol: Indicates the level of alcohol consumption by the student on weekdays.
-                - weekend_alcohol: Indicates the level of alcohol consumption by the student on weekends.
-                - health: Indicates the self-reported health status of the student.
-                - absences: Indicates the number of absences recorded for the student.
-                - grade_1: Represents the student's grade or performance in a certain subject or assessment.
-                - grade_2: Represents another grade or performance measure for the student.
-                - final_grade: Represents the final grade or overall performance of the student.
+            # Append the desired string to the user input
+            user_input = f"""I want you to generate a set of plotly graphs based on the user's request. 
+                             In this input, the variable 'df' will be provided. That is the data you 
+                             will use to generate the graphs. The user request is as follows:
+                {user_input} 
+                Generate Python code that creates different types
+                of graphs (scatter plot, bar chart, and line chart for example) using Plotly.
+                Assume that a DataFrame named 'df' is already available, 
+                containing the necessary data for plotting. Ensure that the code
+                is executable and does not rely on plt.show() to display the graphs.
+                    DataFrame 'df' structure:
+                        - student_id: A unique identifier assigned to each student.
+                        - school: Indicates the school the student attends, such as "GP".
+                        - sex: Represents the gender of the student, either "F" for female or "M" for male.
+                        - age: Denotes the age of the student in years.
+                        - address_type: Describes the type of address the student resides in, categorized as "Urban" or "Rural".
+                        - family_size: Indicates the size of the student's family.
+                        - parent_status: Describes the living arrangement of the student's parents, such as "Living together" or "Apart".
+                        - mother_education: Represents the educational level attained by the student's mother.
+                        - father_education: Represents the educational level attained by the student's father.
+                        - mother_job: Indicates the occupation of the student's mother.
+                        - father_job: Indicates the occupation of the student's father.
+                        - school_choice_reason: Describes the reason behind the student's choice of school or educational institution.
+                        - guardian: Indicates the guardian responsible for the student's welfare.
+                        - travel_time: Represents the time taken by the student to travel to school, categorized into time intervals.
+                        - class_failures: Indicates the number of past class failures experienced by the student.
+                        - school_support: Indicates whether the school provides additional support to the student.
+                        - family_support: Indicates whether the student receives support from their family.
+                        - extra_paid_classes: Indicates whether the student participates in extra paid classes.
+                        - activities: Indicates whether the student participates in extracurricular activities.
+                        - nursery_school: Indicates whether the student attended nursery school.
+                        - higher_ed: Indicates the student's aspiration for higher education.
+                        - internet_access: Indicates whether the student has access to the internet.
+                        - romantic_relationship: Indicates whether the student is involved in a romantic relationship.
+                        - family_relationship: Represents the quality of relationships within the student's family.
+                        - free_time: Indicates the amount of free time the student has after school.
+                        - social: Represents the student's level of social interaction with peers.
+                        - weekday_alcohol: Indicates the level of alcohol consumption by the student on weekdays.
+                        - weekend_alcohol: Indicates the level of alcohol consumption by the student on weekends.
+                        - health: Indicates the self-reported health status of the student.
+                        - absences: Indicates the number of absences recorded for the student.
+                        - grade_1: Represents the student's grade or performance in a certain subject or assessment.
+                        - grade_2: Represents another grade or performance measure for the student.
+                        - final_grade: Represents the final grade or overall performance of the student.
 
-            Your generated code should follow these points:
-                1. Function definitions for generating each type of graph.
-                2. Function definitions for calculating statistics.
-                3. Function definitions for providing additional information.
-                4. Incorporation of the DataFrame 'df' ONLY into each function as a parameter.
-                5. Do not use df.show()/fig.show() to display the graphs, or any other function that will cause new windows to open.
-                6. Check to see if columns are numerical or not.
-                7. Make sure to execute the functions at the end so the graphs, statistics, and information will be generated.
-                8. Make sure to only pass 'df' as a parameter.
-                9. Make sure the graphs are color-coordinated and visually appealing for the dashboard.
-                10. Make sure to have descriptive titles for the graphs, statistics, and information.
+                    Your generated code should include:
+                        1. Function definitions for generating each type of graph.
+                        2. Incorporation of the DataFrame 'df' into each function
+                           as a parameter.
+                        3. Do not use df.show()/fig.show() to display the graphs, as these
+                           will be used in a dashboard.
+                        4. Descriptions of what the code is doing.
+                        5. You must make sure that your code is writen in valid
+                           python syntax.
+                        6. Check to see if columns are numerical or not.
+                        7. Your code is in valid python syntax. 
+                        8. Make sure to execute the functions at the end so the graphs will display.
+                        9. Make sure to only pass 'df' as a parameter.
+                        10. Make sure to color the graphs are complimentary and have good looks for the dashboard. 
+                        11. Make sure to have a descriptive title for the graphs.
 
-            Here are some examples of Python code to help generate your response (keep in mind that these are only examples):
-                import plotly.graph_objects as go
-                    def scatter_plot(df):
-                        '''
-                        Generates a scatter plot using the first two numerical columns of the DataFrame.
-                        
-                        Args:
-                        df (DataFrame): Input DataFrame
-                        
-                        Returns:
-                        fig (plotly.graph_objs.Figure): Scatter plot figure
-                        '''
-                        numeric_cols = df.select_dtypes(include=['number']).columns
-                        if len(numeric_cols) < 2:
-                            raise ValueError("DataFrame must contain at least two numerical columns for a scatter plot.")
-                        
-                        fig = go.Figure(data=go.Scatter(x=df[numeric_cols[0]], y=df[numeric_cols[1]], mode='markers'))
-                        fig.update_layout(title='Scatter Plot', xaxis_title=numeric_cols[0], yaxis_title=numeric_cols[1])
-                        return fig
-
-                    def bar_chart(df):
-                        '''
-                        Generates a bar chart using the first numerical column of the DataFrame.
-                        
-                        Args:
-                        df (DataFrame): Input DataFrame
-                        
-                        Returns:
-                        fig (plotly.graph_objs.Figure): Bar chart figure
-                        '''
-                        categorical_cols = df.select_dtypes(include=['object']).columns
-                        if len(categorical_cols) < 1:
-                            raise ValueError("DataFrame must contain at least one categorical column for a bar chart.")
-                        
-                        category_counts = df[categorical_cols[0]].value_counts()
-                        fig = go.Figure(data=go.Bar(x=category_counts.index, y=category_counts.values))
-                        fig.update_layout(title='Bar Chart', xaxis_title=categorical_cols[0], yaxis_title='Count')
-                        return fig
-
-                    def line_chart(df):
-                        '''
-                        Generates a line chart using all numerical columns of the DataFrame.
-                        
-                        Args:
-                        df (DataFrame): Input DataFrame
-                        
-                        Returns:
-                        fig (plotly.graph_objs.Figure): Line chart figure
-                        '''
-                        numeric_cols = df.select_dtypes(include=['number']).columns
-                        if len(numeric_cols) == 0:
-                            raise ValueError("DataFrame must contain at least one numerical column for a line chart.")
-                        
-                        fig = go.Figure()
-                        for col in numeric_cols:
-                            fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=col))
-                        fig.update_layout(title='Line Chart', xaxis_title='Index', yaxis_title='Values')
-                        return fig
-
-                    import io
-                    import pandas as pd
-                    import dash import html, dcc
-
-                    def dataset_info_and_stats(df):
-                        buffer = io.StringIO()
-                        df.info(buf=buffer)
-                        info = buffer.getvalue()
+                Here is some examples of python code that I wrote in order to help generate your response,
+                keep in mind that these are only examples: 
+                
+                    import plotly.graph_objects as go
+                        def scatter_plot(df):
+                            '''
+                            Generates a scatter plot using the first two numerical columns of the DataFrame.
                             
-                        describe_html = df.describe(include='all').to_html(classes='table table-striped')
-                        null_counts_html = df.isnull().sum().to_frame('Null Count').to_html(classes='table table-striped')
-                        
+                            Args:
+                            df (DataFrame): Input DataFrame
+                            
+                            Returns:
+                            fig (plotly.graph_objs.Figure): Scatter plot figure
+                            '''
+                            numeric_cols = df.select_dtypes(include=['number']).columns
+                            if len(numeric_cols) < 2:
+                                raise ValueError("DataFrame must contain at least two numerical columns for a scatter plot.")
+                            
+                            fig = go.Figure(data=go.Scatter(x=df[numeric_cols[0]], y=df[numeric_cols[1]], mode='markers'))
+                            fig.update_layout(title='Scatter Plot', xaxis_title=numeric_cols[0], yaxis_title=numeric_cols[1])
+                            return fig
 
-                        return html.Div([
-                            html.Div([
-                                html.H3("DataFrame Information"),
-                                dcc.Markdown(f"```\n{info}\n```"), dangerously_allow_html=True)
-                            ]),
-                            html.Div([
-                                html.H3("Descriptive Statistics"),
-                                html.Div(dcc.Markdown(describe_html, dangerously_allow_html=True"))
-                            ])
-                            html.Div([
-                                html.H3("Missing Values"),
-                                html.Div(dcc.Markdown(null_counts_html, dangerously_allow_html=True))
-                            ])
-                        ])
+                        def bar_chart(df):
+                            '''
+                            Generates a bar chart using the first numerical column of the DataFrame.
+                            
+                            Args:
+                            df (DataFrame): Input DataFrame
+                            
+                            Returns:
+                            fig (plotly.graph_objs.Figure): Bar chart figure
+                            '''
+                            numeric_cols = df.select_dtypes(include=['number']).columns
+                            if len(numeric_cols) < 1:
+                                raise ValueError("DataFrame must contain at least one numerical column for a bar chart.")
+                            
+                            fig = go.Figure(data=go.Bar(x=df[numeric_cols[0]], y=df.index))
+                            fig.update_layout(title='Bar Chart', xaxis_title=numeric_cols[0], yaxis_title='Index')
+                            return fig
+
+                        def line_chart(df):
+                            '''
+                            Generates a line chart using all numerical columns of the DataFrame.
+                            
+                            Args:
+                            df (DataFrame): Input DataFrame
+                            
+                            Returns:
+                            fig (plotly.graph_objs.Figure): Line chart figure
+                            '''
+                            numeric_cols = df.select_dtypes(include=['number']).columns
+                            if len(numeric_cols) == 0:
+                                raise ValueError("DataFrame must contain at least one numerical column for a line chart.")
+                            
+                            fig = go.Figure()
+                            for col in numeric_cols:
+                                fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=col))
+                            fig.update_layout(title='Line Chart', xaxis_title='Index', yaxis_title='Values')
+                            return fig
+
                 Please ensure that the graph effectively represents something of meaning revolving around the data frame.
-                Also remember that the graph functions should ONLY have 'df' as a parameter that is being passed to them.
-                Remember that 'df' is a DataFrame that is supplied by the user. It is what is used to generate the graphs.
-                This will be displayed in a dashboard so make sure to not use df.show()/fig.show() or any function that will cause new windows to open. 
+                Along with this make sure that you are importing all of the neccessary packages as the code provided is just an example. 
+                remember that 'df' is a DataFrame that is supplied by the user. It is what is used to generate the graphs.
             """
 
             # print(user_input)
@@ -256,37 +279,34 @@ def register_callbacks(app, openai_client):
             # extract the code to run from this response
             extracted_code = model_response
 
-            # Printing the steps
+            # Printing the steps 
             message = extract_message(extracted_code)
-            print(message)
+            print(message) 
 
-            # clean the code
-            cleaned_code = clean_code_string(extracted_code)
-            
-            print("Cleaned Code:",cleaned_code)
+            # clean the code 
+            cleaned_code = clean_code_string(extracted_code) 
+            print("Cleaned Code: ", cleaned_code)
 
-            if cleaned_code is None:
-                raise PreventUpdate  # Don't update the app if the code cleanup fails
+            if cleaned_code is None: 
+                raise PreventUpdate # Don't update the app if the code cleanup fails  
 
             # run the cleaned code using the exec function
             exec_global = {'df': df}
-            try:
-                exec(cleaned_code, exec_global)
+            try: 
+                exec(cleaned_code, exec_global) 
             except Exception as e:
                 print(f"Error in execution: {e}")
                 raise PreventUpdate
 
             # use the outputs of the executed code to update the app
-            plot_functions = {name: func for name, func in exec_global.items() if callable(func) and name.startswith('plot_')}
-            stats_functions = {name: func for name, func in exec_global.items() if callable(func) and name.startswith('stats_')}
-            info_functions = {name: func for name, func in exec_global.items() if callable(func) and name.startswith('info_')}
+            # Check if any plot functions are defined
+            plot_functions = {name: func for name, func in exec_global.items() if callable(func)}
 
-            if not plot_functions and not stats_functions and not info_functions:
+            if not plot_functions:
                 raise PreventUpdate
-
+            
             # Generate Plots
             plot_figures = []
-            
             for name, plot_function in plot_functions.items():
                 try:
                     # Call the plot function with the global df
@@ -295,39 +315,71 @@ def register_callbacks(app, openai_client):
                     # Style the graph
                     plot_figure.update_layout(
                         plot_bgcolor='#2d2d2d',  # Dark gray background
-                        paper_bgcolor='#2d2d2d',  # Dark gray border
-                        font_color='white'  # White text color
+                        paper_bgcolor='#333333',  # Slightly lighter background
+                        font=dict(
+                            family='Arial',  # font
+                            size=14,
+                            color='#d9d9d9'  # Light gray font color
+                        ),
+                        title=dict(
+                            text=f'Graph {name}',
+                            x=0.5,
+                            font=dict(
+                                family='Arial',
+                                size=18,
+                                color='#ffffff'  # White title color
+                            )
+                        ),
+                        margin=dict(l=60, r=60, t=60, b=60),
+                        xaxis=dict(
+                            gridcolor='#555555',  # Subtle grid line color
+                            gridwidth=0.5
+                        ),
+                        yaxis=dict(
+                            gridcolor='#555555',
+                            gridwidth=0.5
+                        )
                     )
 
-                    plot_figures.append(dcc.Graph(figure=plot_figure))
-                except Exception as e:
-                    print(f"Error generating plot '{name}': {e}")
+                    # Additional styling for specific plot types
+                    # Not working I dont think
+                    if isinstance(plot_figure, go.Scatter):
+                        plot_figure.update_traces(marker=dict(color='#ff8c00'))  # Orange marker color for scatter plots
 
-            # Generate Statistics
-            stats_components = []
-            for name, stats_function in stats_functions.items():
-                try:
-                    stats_output = stats_function(df)
-                    if isinstance(stats_output, (tuple, list)):
-                        stats_components.extend([html.Div(name), *stats_output])
-                    else:
-                        stats_components.append(html.Div([html.P(name), html.Pre(stats_output)]))
-                except Exception as e:
-                    print(f"Error generating statistics '{name}': {e}")
+                    elif isinstance(plot_figure, go.Bar):
+                        plot_figure.update_traces(marker=dict(color='#5599ff'))  # Light blue bar color for bar charts
 
-            # Generate Additional Information
-            info_components = []
-            for name, info_function in info_functions.items():
-                try:
-                    info_output = info_function(df)
-                    if isinstance(info_output, (tuple, list)):
-                        info_components.extend([html.Div(name), *info_output])
-                    else:
-                        info_components.append(html.Div([html.P(name), html.Pre(info_output)]))
+                    # add style for other types of charts (Histogram, Pie, Heatmap, Box plot, Violin, ...., ect.)
+
+                    # Wrap the styled plot figure in a styled container
+                    plot_figures.append(
+                        html.Div(style={
+                            'backgroundColor': '#2d2d2d',
+                            'padding': '20px',
+                            'borderRadius': '5px',
+                            'boxShadow': '0 0 10px rgba(0, 0, 0, 0.3)'
+                    }, children=[
+                        html.H4(f"Graph {name}", style={
+                            'color': '#ffffff',
+                            'marginBottom': '10px'
+                        }),
+                        dcc.Graph(figure=plot_figure, style={
+                            'width': '100%',
+                            'height': '400px',
+                            'backgroundColor': '#333333',
+                            'color': '#d9d9d9'
+                        })
+                    ]))
                 except Exception as e:
-                    print(f"Error generating information '{name}': {e}")
-                    
-            return plot_figures, stats_components, info_components
+                    print(f"Error generating plot: {e}")
+                    continue
+
+            return plot_figures
+    
+    @app.callback(
+        Output('output-plots', 'children', allow_duplicate=True),
+        [Input('generate-response', 'data')]
+    )
         
   
     @app.callback(
@@ -349,5 +401,7 @@ def register_callbacks(app, openai_client):
     )
     def update_output(list_of_contents, list_of_names, list_of_dates):
         if list_of_contents is not None:
-            children = [parse_contents(c, n) for c, n in zip(list_of_contents, list_of_names)]
+            global df
+            children = [parse_contents(c, n, d) for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)]
             return children
+    
