@@ -18,6 +18,8 @@ def app_layout():
     }
 
     content_style = {
+        'minHeight': '100px',
+        'border': '1px solid black',
         'marginTop': '50px',
         'marginBottom': '100px',
         'zIndex': 2,
@@ -101,18 +103,18 @@ def app_layout():
     }
     
     upload_success_style = {
-    'color': '#4CAF50',  # Green color for success messages
-    'backgroundColor': '#dff0d8',  # Light green background for better visibility
-    'fontSize': '16px',  # Sufficient size for readability
+    'color': '#4CAF50',  
+    'backgroundColor': '#dff0d8',  
+    'fontSize': '16px',  
     'fontWeight': 'bold',
-    'padding': '10px 20px',  # Padding to make the text more prominent
-    'borderRadius': '5px',  # Rounded corners for modern look
-    'border': '1px solid #c3e6cb',  # Subtle border matching the background
-    'boxShadow': '0 2px 4px rgba(0,0,0,0.2)',  # Soft shadow for 3D effect
-    'width': 'auto',  # Automatic width based on content
-    'margin': '10px auto',  # Center horizontally
-    'textAlign': 'center',  # Center text inside the div
-    'display': 'block',  # Block display to occupy its own space
+    'padding': '10px 20px',  
+    'borderRadius': '5px',  
+    'border': '1px solid #c3e6cb',  
+    'boxShadow': '0 2px 4px rgba(0,0,0,0.2)',  
+    'width': 'auto',  
+    'margin': '10px auto',  
+    'textAlign': 'center',  
+    'display': 'block',  
     }
 
     layout = html.Div([
@@ -130,9 +132,9 @@ def app_layout():
 
         dcc.Loading(id="loading", type='dot', color='orange', 
             children=[
-            html.Div(id='output-plots', style=content_style),
-            html.Div(id='output-statistics', style=content_style),
-            html.Div(id='output-info', style=content_style),
+            html.Div(id='output-plots', style=content_style, children='Placeholder for plots'),
+            html.Div(id='output-statistics', style=content_style, children='Placeholder for statistics'),
+            html.Div(id='output-info', style=content_style, children='Placeholder for additional information'),
         ]),
 
         html.Div([
