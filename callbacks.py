@@ -7,6 +7,7 @@ import plotly.graph_objs as go
 from dash.exceptions import PreventUpdate
 
 # Initialized dataframe
+global df
 df = None
 
 # Function to extract messages from the model response
@@ -313,10 +314,7 @@ def register_callbacks(app, openai_client):
             By returning the Dash components directly, they will be rendered within the designated areas in the user interface, rather than opening in new browser windows.
             '''
         
-        
         return plot_figures, stats_components, info_components #not sure about this 
-
-        raise PreventUpdate #also forgot where this should go
   
     @app.callback(
         Output('upload-success-message', 'children'),
