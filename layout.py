@@ -102,20 +102,20 @@ def app_layout():
         'zIndex': 1
     }
     
-    upload_success_style = {
-    'color': '#4CAF50',  
-    'backgroundColor': '#dff0d8',  
-    'fontSize': '16px',  
-    'fontWeight': 'bold',
-    'padding': '10px 20px',  
-    'borderRadius': '5px',  
-    'border': '1px solid #c3e6cb',  
-    'boxShadow': '0 2px 4px rgba(0,0,0,0.2)',  
-    'width': 'auto',  
-    'margin': '10px auto',  
-    'textAlign': 'center',  
-    'display': 'block',  
-    }
+    # upload_success_style = {
+    # 'color': '#4CAF50',  
+    # 'backgroundColor': '#dff0d8',  
+    # 'fontSize': '16px',  
+    # 'fontWeight': 'bold',
+    # 'padding': '10px 20px',  
+    # 'borderRadius': '5px',  
+    # 'border': '1px solid #c3e6cb',  
+    # 'boxShadow': '0 2px 4px rgba(0,0,0,0.2)',  
+    # 'width': 'auto',  
+    # 'margin': '10px auto',  
+    # 'textAlign': 'center',  
+    # 'display': 'block',  
+    # }
 
     layout = html.Div([
         html.Div([
@@ -148,9 +148,9 @@ def app_layout():
                 multiple=True
             ),            
             html.Div(id='output-data-upload', style=upload_data_style),
+            html.Div(id='upload-success-message', children=""),
         ]),
 
-        html.Div(id='upload-success-message', children="", style=upload_success_style),
 
         html.Div([
             dcc.Input(id='user-input', placeholder='How can Querri help you today?', style=input_style),

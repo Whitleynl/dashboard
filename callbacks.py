@@ -318,13 +318,14 @@ def register_callbacks(app, openai_client):
   
     @app.callback(
         Output('upload-success-message', 'children'),
+        Output('upload-success-message', 'style'),
         [Input('upload-data', 'contents')],
         [State('upload-data', 'filename')]
     )
     def upload_success_message(contents, filename):
         if contents:
-            return f'Upload Successful: {filename}'
-        return ''
+            return f'Upload Successful: {filename}', {'display': 'block', 'color': 'green', 'fontSize': '20px', 'fontWeight': 'bold', 'textAlign': 'center'}
+        return '', {'display': 'none'}
 
     @app.callback(
         Output('output-data-upload', 'children'),
