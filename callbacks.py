@@ -1,5 +1,6 @@
 import base64
 import io
+from logging import info
 import re
 import pandas as pd
 from dash import dcc, html, Input, Output, State, dash_table, exceptions
@@ -88,8 +89,8 @@ def parse_contents(contents, filename):
 def register_callbacks(app, openai_client):
     @app.callback(
         [Output('output-plots', 'children', allow_duplicate=True),
-         Output('output-statistics', 'children', allow_duplicate=True),
-         Output('output-info', 'children', allow_duplicate=True)],
+        Output('output-statistics', 'children', allow_duplicate=True),
+        Output('output-info', 'children', allow_duplicate=True)],
         [Input('submit-button', 'n_clicks')],
         [State('user-input', 'value'), State('project-dropdown', 'value')]
     )
@@ -209,18 +210,33 @@ def register_callbacks(app, openai_client):
                         fig.update_layout(title='Line Chart', xaxis_title='Index', yaxis_title='Values')
                         return fig
 
+                    import io
+                    import pandas as pd
+                    import dash import html, dcc
 
+                    def dataset_info_and_stats(df):
+                        buffer = io.StringIO()
+                        df.info(buf=buffer)
+                        info = buffer.getvalue()
+                            
+                        describe_html = df.describe(include='all').to_html(classes='table table-striped')
+                        null_counts_html = df.isnull().sum().to_frame('Null Count').to_html(classes='table table-striped')
+                        
 
-                        def dataset_info_and_stats(df):
-                            info = df.info()
-                            describe = df.describe()
-                            return info, describe
-
-                        scatter_plot(df)
-                        bar_chart(df)
-                        line_chart(df)
-                        dataset_info_and_stats(df)
-                
+                        return html.Div([
+                            html.Div([
+                                html.H3("DataFrame Information"),
+                                dcc.Markdown(f"```\n{info}\n```"), dangerously_allow_html=True)
+                            ]),
+                            html.Div([
+                                html.H3("Descriptive Statistics"),
+                                html.Div(dcc.Markdown(describe_html, dangerously_allow_html=True"))
+                            ])
+                            html.Div([
+                                html.H3("Missing Values"),
+                                html.Div(dcc.Markdown(null_counts_html, dangerously_allow_html=True))
+                            ])
+                        ])
                 Please ensure that the graph effectively represents something of meaning revolving around the data frame.
                 Also remember that the graph functions should ONLY have 'df' as a parameter that is being passed to them.
                 Remember that 'df' is a DataFrame that is supplied by the user. It is what is used to generate the graphs.
@@ -246,6 +262,8 @@ def register_callbacks(app, openai_client):
 
             # clean the code
             cleaned_code = clean_code_string(extracted_code)
+            
+            print("Cleaned Code:",cleaned_code)
 
             if cleaned_code is None:
                 raise PreventUpdate  # Don't update the app if the code cleanup fails
@@ -268,6 +286,7 @@ def register_callbacks(app, openai_client):
 
             # Generate Plots
             plot_figures = []
+            
             for name, plot_function in plot_functions.items():
                 try:
                     # Call the plot function with the global df
@@ -307,14 +326,9 @@ def register_callbacks(app, openai_client):
                         info_components.append(html.Div([html.P(name), html.Pre(info_output)]))
                 except Exception as e:
                     print(f"Error generating information '{name}': {e}")
-            '''
-            return three lists, each containing the dash components for the plots, statistics, and information, respectively.
-            these components will then be displayed in the corresponding dash components output-plots, output-statistics, and output-info. 
-            Make sure to replace the plot_figure1, plot_figure2, stats_output, and info_output variables with the actual outputs from your code generation logic.
-            By returning the Dash components directly, they will be rendered within the designated areas in the user interface, rather than opening in new browser windows.
-            '''
+                    
+            return plot_figures, stats_components, info_components
         
-        return plot_figures, stats_components, info_components #not sure about this 
   
     @app.callback(
         Output('upload-success-message', 'children'),
