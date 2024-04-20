@@ -15,6 +15,7 @@ def app_layout():
         'width': '250px',
         'height': '100vh',
         'fontWeight': 'bold',
+        'transition': 'all 0.3s',
     }
 
     content_style = {
@@ -24,7 +25,7 @@ def app_layout():
         'marginBottom': '100px',
         'zIndex': 2,
         'display': 'grid',
-        'gridTemplateColumns': 'repeat(auto-fit, minmax(400px, 1fr))',
+        'gridTemplateColumns': '1fr 1fr 1fr',
         'gridGap': '20px',
         'margin': '0 auto',
         'padding': '20px'
@@ -133,8 +134,8 @@ def app_layout():
         dcc.Loading(id="loading", type='dot', color='orange', 
             children=[
             html.Div(id='output-plots', style=content_style, children='Placeholder for plots'),
-            html.Div(id='output-statistics', style=content_style, children='Placeholder for statistics'),
-            html.Div(id='output-info', style=content_style, children='Placeholder for additional information'),
+            # html.Div(id='output-statistics', style=content_style, children='Placeholder for statistics'),
+            # html.Div(id='output-info', style=content_style, children='Placeholder for additional information'),
         ]),
 
         html.Div([

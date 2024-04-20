@@ -130,9 +130,9 @@ def parse_contents(contents, filename, data):
 # Register the app callbacks
 def register_callbacks(app, openai_client):
     @app.callback(
-        [Output('output-plots', 'children', allow_duplicate=True),
-        Output('output-statistics', 'children', allow_duplicate=True),
-        Output('output-info', 'children', allow_duplicate=True)],
+        Output('output-plots', 'children', allow_duplicate=True),
+        # Output('output-statistics', 'children', allow_duplicate=True),
+        # Output('output-info', 'children', allow_duplicate=True)],
         [Input('submit-button', 'n_clicks')],
         [State('user-input', 'value'), State('project-dropdown', 'value')]
     )
@@ -201,7 +201,7 @@ def register_callbacks(app, openai_client):
                         10. Make sure to color the graphs are complimentary and have good looks for the dashboard. 
                         11. Make sure to have a descriptive title for the graphs.
 
-                Here is some examples of python code that I wrote in order to help generate your response,
+                Here are some examples of python code that I wrote in order to help generate your response,
                 keep in mind that these are only examples: 
                 
                     import plotly.graph_objects as go
