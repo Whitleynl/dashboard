@@ -255,8 +255,11 @@ def about_layout():
         'flexDirection': 'row',
         'fontFamily': 'Open Sans, sans-serif',
         'alignItems': 'center',
-        'justifyContent': 'center',
-        # 'left': '292px',
+        'position': 'fixed',
+        'top': 0,
+        'bottom': 0,
+        'left': '292px',
+        'right': 0,
         'backgroundColor': '#394349',
         'minHeight': '100vh',
     })
