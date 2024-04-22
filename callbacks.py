@@ -359,10 +359,6 @@ def register_callbacks(app, openai_client):
                             'borderRadius': '5px',
                             'boxShadow': '0 0 10px rgba(0, 0, 0, 0.3)'
                     }, children=[
-                        html.H4(f"Graph {name}", style={
-                            'color': '#ffffff',
-                            'marginBottom': '10px'
-                        }),
                         dcc.Graph(figure=plot_figure, style={
                             'width': '100%',
                             'height': '400px',

@@ -22,15 +22,16 @@ def app_layout():
 
     content_style = {
         'minHeight': '100px',
+        'width': '1200px',
         'border': '1px solid black',
-        'marginTop': '50px',
-        'marginBottom': '100px',
+        'marginTop': '200px',
+        'marginBottom': '10px',
         'zIndex': 2,
         'display': 'grid',
         'gridTemplateColumns': '1fr 1fr 1fr',
         'gridGap': '20px',
-        'margin': '0 auto',
-        'padding': '20px'
+        'padding': '20px',
+        'justifyContent': 'center',
     }
 
     upload_button_style = {
@@ -50,7 +51,7 @@ def app_layout():
         'display': 'flex',
         'justifyContent': 'center',
         'alignItems': 'center',
-        'width': '100%',
+        'width': '1200px',
         'height': '120px',
         'backgroundColor': 'lightgray',
         'opacity': '0.3',
@@ -251,14 +252,11 @@ def about_layout():
         ], style={'textAlign': 'center', 'fontSize': '35px'})
     ], style={
         'display': 'flex',
-        'flexDirection': 'column',
+        'flexDirection': 'row',
         'fontFamily': 'Open Sans, sans-serif',
         'alignItems': 'center',
-        'position': 'fixed',
-        'top': 0,
-        'bottom': 0,
-        'left': '292px',
-        'right': 0,
+        'justifyContent': 'center',
+        # 'left': '292px',
         'backgroundColor': '#394349',
         'minHeight': '100vh',
     })
