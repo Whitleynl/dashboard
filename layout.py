@@ -121,7 +121,7 @@ def app_layout():
         'fontSize': '12px',
         'fontWeight': 'bold',  # Make text bold
         'border': 'none',  # Remove border for a more modern look
-        'backgroundColor': '#4CAF50',  # Add a background color
+        'backgroundColor': '#f45b23',  # Add a background color
         'color': 'white',  # Change text color to white
         'textTransform': 'uppercase',  # Make text uppercase for a more modern look
         'textDecoration': 'none',  # Remove underline
@@ -204,7 +204,7 @@ def about_layout():
     }
 
     get_started_button_style = {
-        'backgroundColor': '#4CAF50',
+        'backgroundColor': '#f45b23',
         'border': 'none',
         'color': 'white',
         'padding': '15px 32px',
