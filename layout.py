@@ -188,21 +188,6 @@ def app_layout():
     return layout
 
 def about_layout():
-    sidebar_style = {
-        'position': 'fixed', 
-        'top': 0, 
-        'left': 0, 
-        'bottom': 0, 
-        'backgroundColor': '#1D2025', 
-        'color': 'black', 
-        'padding': '20px',
-        'textAlign': 'center',
-        'width': '250px',
-        'height': '100vh',
-        'fontWeight': 'bold',
-        'transition': 'all 0.3s',
-    }
-
     content_style = {
         'minHeight': '100px',
         'border': '1px solid black',
@@ -213,55 +198,61 @@ def about_layout():
         'gridTemplateColumns': '1fr 1fr 1fr',
         'gridGap': '20px',
         'margin': '0 auto',
-        'padding': '20px'
+        'padding': '0px',
+        'opacity': 0,  # Start with opacity 0
+        'animation': 'fadein 3s forwards',  # Apply fade-in animation
     }
 
-    about_button_style = {
-        'height': '60px',
-        'width': '60px',
-        'borderRadius': '30px',  
+    get_started_button_style = {
+        'backgroundColor': '#4CAF50',
+        'border': 'none',
+        'color': 'white',
+        'padding': '15px 32px',
+        'textAlign': 'center',
+        'textDecoration': 'none',
+        'display': 'inline-block',
+        'fontSize': '16px',
+        'margin': '4px 2px',
         'cursor': 'pointer',
-        'position': 'absolute',
-        'left': '30px',
-        'bottom': '50px',
-        'display': 'flex',
-        'alignItems': 'center',  
-        'justifyContent': 'center',  
-        'zIndex': 1,
-        'fontSize': '12px',
-        'fontWeight': 'bold',  
-        'border': 'none',  
-        'backgroundColor': '#4CAF50',  
-        'color': 'white',  
-        'textTransform': 'uppercase',  
-        'textDecoration': 'none',  
+        'borderRadius': '12px',
+        'opacity': 0,  # Start with opacity 0
+        'animation': 'fadein 3s forwards',  # Apply fade-in animation
     }
 
     layout = html.Div([
         html.Div([
-            html.Img(src="/assets/QuerriTransLogo.svg", style={'width': '100%', 'display': 'block', 'margin': '5px auto'}),
+            html.H1("Visualize your Data", style={'color': 'white', 'textAlign': 'center', 'fontWeight': 'bold',  'fontSize': '70px', 'color': '#f45b23', 'opacity': 0, 'animation': 'fadein 4s forwards'}),
             html.Div([
-                dcc.Link('Back to Home', href='/', style={'color': 'white', 'textDecoration': 'none'}),
-            ], style=about_button_style),
-        ], style=sidebar_style),
-
-        html.Div([
-            html.H1("Visualize your Data", style={'color': 'white', 'textAlign': 'center', 'fontWeight': 'bold',  'fontSize': '70px', 'color': '#f45b23'}),
-            html.P("Welcome to the Querri Data Visualization Dashboard. To get started, simply upload any valid CSV file and then ask the prompt what type of visualized version of the data you can see. You can also create new dashboards on the left-hand side.", style={'color': 'white' , 'padding': '90px'}),
-            html.P("Get started any time by clicking the back button on the bottom left. You can also learn more about Querri by clicking the logo in the top left.", style={'color': 'white' , 'padding': '90px'}),
-        ], style={'textAlign': 'center', 'fontSize': '35px'})
+                html.P("Welcome to the Querri Data Visualization Dashboard, a collaborative creation that empowers users to effortlessly generate and customize insightful dashboards tailored to their needs. Developed in partnership with Querri, this intuitive tool revolutionizes the way you interact with data.", 
+                       style={
+                           'color': 'white',
+                           'opacity': 0,  # Start with opacity 0
+                           'animation': 'fadein 4s forwards',  # Apply fade-in animation
+                           }, ),
+                html.P("Upload any CSV file and let the prompt generate visualizations tailored to your needs. Customize each graph, save them as PDFs, and even create new dashboards for different projects.", 
+                       style={
+                           'color': 'white',
+                           'opacity': 0,  # Start with opacity 0
+                           'animation': 'fadein 4s forwards',  # Apply fade-in animation
+                           }, ),
+                html.P("Transform your data into actionable insights effortlessly with the Querri Data Visualization Dashboard. Get started by clicking the button below!", 
+                       style={
+                           'color': 'white',
+                           'opacity': 0,  # Start with opacity 0
+                           'animation': 'fadein 4s forwards',  # Apply fade-in animation
+                           }, ),
+                dcc.Link('Get Started', href='/home', style=get_started_button_style),
+            ], style={'padding': '30px'}),
+        ], style={'textAlign': 'center', 'fontSize': '45px', 'margin': '50px'})
     ], style={
-        'display': 'flex',
-        'flexDirection': 'row',
         'fontFamily': 'Open Sans, sans-serif',
-        'alignItems': 'center',
-        'position': 'fixed',
+        'position': 'absolute',
         'top': 0,
         'bottom': 0,
-        'left': '292px',
+        'left': 0,
         'right': 0,
         'backgroundColor': '#394349',
         'minHeight': '100vh',
-    })
+    }, id='about-page')
 
     return layout

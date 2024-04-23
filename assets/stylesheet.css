@@ -5,3 +5,12 @@
     opacity: 1;
     font-weight: bold;
   }
+
+  @keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
