@@ -148,7 +148,7 @@ def app_layout():
 
         dcc.Loading(id="loading", type='dot', color='orange', 
             children=[
-            html.Div(id='output-plots', style=content_style, children='Placeholder for plots'),
+            html.Div(id='output-plots', style=content_style),
             # html.Div(id='output-statistics', style=content_style, children='Placeholder for statistics'),
             # html.Div(id='output-info', style=content_style, children='Placeholder for additional information'),
         ]),

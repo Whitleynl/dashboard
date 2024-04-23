@@ -220,7 +220,7 @@ def register_callbacks(app, openai_client):
                                 raise ValueError("DataFrame must contain at least two numerical columns for a scatter plot.")
                             
                             fig = go.Figure(data=go.Scatter(x=df[numeric_cols[0]], y=df[numeric_cols[1]], mode='markers'))
-                            fig.update_layout(title='Scatter Plot', xaxis_title=numeric_cols[0], yaxis_title=numeric_cols[1])
+                            fig.update_layout(title='Student Age vs. Final Grade', xaxis_title=numeric_cols[0], yaxis_title=numeric_cols[1])
                             return fig
 
                         def bar_chart(df):
@@ -238,7 +238,7 @@ def register_callbacks(app, openai_client):
                                 raise ValueError("DataFrame must contain at least one numerical column for a bar chart.")
                             
                             fig = go.Figure(data=go.Bar(x=df[numeric_cols[0]], y=df.index))
-                            fig.update_layout(title='Bar Chart', xaxis_title=numeric_cols[0], yaxis_title='Index')
+                            fig.update_layout(title='Participation in Extra-Curricular Activities', xaxis_title=numeric_cols[0], yaxis_title='Index')
                             return fig
 
                         def line_chart(df):
@@ -258,7 +258,7 @@ def register_callbacks(app, openai_client):
                             fig = go.Figure()
                             for col in numeric_cols:
                                 fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=col))
-                            fig.update_layout(title='Line Chart', xaxis_title='Index', yaxis_title='Values')
+                            fig.update_layout(title='Average Final Grade by Age', xaxis_title='Index', yaxis_title='Values')
                             return fig
 
                 Please ensure that the graph effectively represents something of meaning revolving around the data frame.
@@ -311,6 +311,16 @@ def register_callbacks(app, openai_client):
                 try:
                     # Call the plot function with the global df
                     plot_figure = plot_function(df)
+                    
+                    #set title based on plot type:
+                    if 'scatter' in name:
+                        plot_title = 'Student Age vs. Final Grade'
+                    elif 'bar' in name:
+                        plot_title = 'Participation in Extra-Curricular Activities'
+                    elif 'line' in name:
+                        plot_title = 'Average Final Grade by Age'
+                    else:
+                        plot_title = 'Detailed Plot'
 
                     # Style the graph
                     plot_figure.update_layout(
@@ -322,7 +332,7 @@ def register_callbacks(app, openai_client):
                             color='#d9d9d9'  # Light gray font color
                         ),
                         title=dict(
-                            text=f'Graph {name}',
+                            text=plot_title,
                             x=0.5,
                             font=dict(
                                 family='Arial',
